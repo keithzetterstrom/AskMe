@@ -10,24 +10,21 @@
 
   <body>
     <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
-
 	    <a class="navbar-brand ml-5" href="#">AskMe</a>
 	    <form class="container form-inline mx-5 my-2 my-lg-0">
 	      <input class="form-control col-11 mr-2" type="text" placeholder="Search" aria-label="Search">
 	      <button class="btn btn-secondary col-auto px-3 my-2 my-sm-0" type="submit">Ask!</button>
 	    </form>
-
-        
-    	<div class="d-flex float-right mx-5">
-    		<div class="container">
-    			<img class="img rounded" src="{% static '/img/avatar.jpg' %}">
-    		</div>
-    		<div class="d-flex flex-column">
-    			<p class="text-left">User Name</p>
-    			<p class="text-center">azazaza</p>
-    		</div>
-    	</div>
-        
+	    <div class="container w-25">
+			<img class="img rounded" src="{% static '/img/avatar.jpg' %}">
+		    <div class="container navbar-text ml-3">
+		    	Vasya Pupkin
+		    	<div class="d-inline-flex">
+		    		<a href="#home">settings</a>
+		    		<a class="ml-3" href="#home">log out</a>
+		    	</div>
+		    </div>
+        </div>
 	</nav>
 	
 	<div class="d-flex justify-content-end mt-5 mr-3">
@@ -45,7 +42,7 @@
 		  	</div>
 		</div>
 	  </div>
-	</div> 
+	</div>
 
     <script src="{% static '/js/jquery-3.4.1.slim.min.js' %}"></script>
     <script src="{% static '/js/bootstrap.bundle.min.js' %}"></script>
