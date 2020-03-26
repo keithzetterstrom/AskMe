@@ -1,0 +1,14 @@
+.chip.chip-md {
+    height: 42px;
+    line-height: 42px;
+    border-radius: 21px;
+  }
+  
+  .chip.chip-md .close {
+    height: 42px;
+    line-height: 42px;
+    border-radius: 21px;
+  }
+  .center {
+    text-align:center;
+  }
