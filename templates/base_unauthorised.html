@@ -18,15 +18,21 @@
 
          <ul class="navbar-nav col-auto ml-3">
            <li class="nav-item">
-             <a class="nav-link" href="#home">Sign In</a>
+             <a class="nav-link" href="{% url 'ask_me:login' %}">Sign In</a>
            </li>
            <li class="nav-item">
              <a class="nav-link" href="#about">Sign Up</a>
            </li>
          </ul>
 	</nav>
-	
+
 	<div class="d-flex justify-content-end mt-5 mr-3">
+      <div class="p-2 w-75 bd-highlight mt-5">
+	  	<div class="media">
+		  	{% block content %}
+		  	{% endblock %}
+		</div>
+      </div>
 	  <div class="p-2 w-25 bd-highlight mt-5">
 	  	<div class="media">
 		  	<div class="media-body">
