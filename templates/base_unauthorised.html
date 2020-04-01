@@ -2,56 +2,54 @@
 
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <title>AskMe project</title>
-    <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.min.css' %}">
-  </head>
+    <head>
+        <meta charset="utf-8">
+        <title>AskMe project</title>
+        <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.min.css' %}">
+    </head>
 
-  <body>
-    <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
+    <body>
+        <nav class="navbar navbar-expand navbar-dark bg-dark fixed-top">
 
-	    <a class="navbar-brand ml-5" href="#">AskMe</a>
-	    <form class="container form-inline mx-5 my-2 my-lg-0">
-	      <input class="form-control col-11 mr-2" type="text" placeholder="Search" aria-label="Search">
-	      <button class="btn btn-secondary col-auto px-3 my-2 my-sm-0" type="submit">Ask!</button>
-	    </form>
+	        <a class="navbar-brand ml-5" href="{% url 'ask_me:questions' %}">AskMe</a>
+	        <form class="container form-inline mx-5 my-2 my-lg-0">
+	            <input class="form-control col-11 mr-2" type="text" placeholder="Search" aria-label="Search">
+	            <button class="btn btn-secondary col-auto px-3 my-2 my-sm-0" type="submit">Ask!</button>
+	        </form>
 
-         <ul class="navbar-nav col-auto ml-3">
-           <li class="nav-item">
-             <a class="nav-link" href="{% url 'ask_me:login' %}">Sign In</a>
-           </li>
-           <li class="nav-item">
-             <a class="nav-link" href="#about">Sign Up</a>
-           </li>
-         </ul>
-	</nav>
+            <ul class="navbar-nav col-auto ml-3">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'ask_me:login' %}">Sign In</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'ask_me:sing_up' %}">Sign Up</a>
+                </li>
+            </ul>
+	    </nav>
 
-	<div class="d-flex justify-content-end mt-5 mr-3">
-      <div class="p-2 w-75 bd-highlight mt-5">
-	  	<div class="media">
-		  	{% block content %}
-		  	{% endblock %}
-		</div>
-      </div>
-	  <div class="p-2 w-25 bd-highlight mt-5">
-	  	<div class="media">
-		  	<div class="media-body">
-			    <h5 class="mt-0">Popular tags</h5>
-			    Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-		  	</div>
-		</div>
-		<div class="media mt-4">
-		  	<div class="media-body">
-			    <h5 class="mt-0">Best members</h5>
-			    Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-		  	</div>
-		</div>
-	  </div>
-	</div> 
+	    <div class="row justify-content-end mt-5 mr-3">
+            <div class="col-sm-8 p-2 w-75 bd-highlight mt-5">
+		  	        {% block content %}
+		  	        {% endblock %}
+            </div>
+	        <div class="col-sm-4 p-2 w-25 bd-highlight mt-5">
+	  	        <div class="media">
+		  	        <div class="media-body">
+			            <h5 class="mt-0">Popular tags</h5>
+                        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+		  	        </div>
+		        </div>
+		        <div class="media mt-4">
+		  	        <div class="media-body">
+			            <h5 class="mt-0">Best members</h5>
+			             Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+		  	        </div>
+		        </div>
+	        </div>
+	    </div>
 
-    <script src="{% static '/js/jquery-3.4.1.slim.min.js' %}"></script>
-    <script src="{% static '/js/bootstrap.bundle.min.js' %}"></script>
+        <script src="{% static '/js/jquery-3.4.1.slim.min.js' %}"></script>
+        <script src="{% static '/js/bootstrap.bundle.min.js' %}"></script>
 
-  </body>
+    </body>
 </html>
