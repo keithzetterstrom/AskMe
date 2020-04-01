@@ -1,41 +1,38 @@
 {% extends 'base_unauthorised.html' %}
 {% load static %}
 
-    {% block content %}
-    <body class="text-center">
-        <div class="sing_in col-8 mx-auto">
-            <h4 class="text-md-left my-4" style=";">Login</h4>
+{% block content %}
+    <div class="col-8 mx-auto">
+        <h4 class="my-4">Login</h4>
 
-            <form name="login" onsubmit="return validform()" action="success.php" method="">
-                <div class="form-group row">
-                    <label for="login" class="col-md-4 col-form-label text-md-left">Login</label>
-                    <div class="col-md-8">
-                        <input type="text" id="login" class="form-control" name="login">
-                    </div>
+        <form name="login" onsubmit="return validform()" action="success.php" method="">
+            <div class="form-group row">
+                <label for="login" class="col-md-4 col-form-label text-md-left">Login</label>
+                <div class="col-md-8">
+                    <input type="text" id="login" class="form-control" name="login">
                 </div>
+            </div>
 
-                <div class="form-group row">
-                    <label for="password" class="col-md-4 col-form-label text-md-left">Password</label>
-                    <div class="col-md-8">
-                        <input type="password" id="password" class="form-control" name="password">
-                    </div>
+            <div class="form-group row">
+                <label for="password" class="col-md-4 col-form-label text-md-left">Password</label>
+                <div class="col-md-8">
+                    <input type="password" id="password" class="form-control" name="password">
                 </div>
+            </div>
 
-                <div class="col-md-8 mx-auto">
-                    <button type="submit" class="btn btn-secondary">
-                        Login
-                    </button>
-                </div>
+            <div class="col-md-6 offset-md-4">
+                <button type="submit" class="btn btn-secondary">
+                    Login
+                </button>
+            </div>
 
-                <div class="col-md-8 mx-auto my-4">
-                    <a href="{% url 'ask_me:sing_up' %}" class="text-secondary">
-                        create a new account
-                    </a>
-                </div>
+            <div class="col-md-6 offset-md-4 my-4">
+                <a href="{% url 'ask_me:sing_up' %}" class="text-secondary">
+                    create new account
+                </a>
+            </div>
 
-            </form>
-        </div>
-    </body>
-
-    {% endblock %}
+        </form>
+    </div>
+{% endblock %}
 

@@ -6,6 +6,7 @@
         <meta charset="utf-8">
         <title>AskMe project</title>
         <link rel="stylesheet" type="text/css" href="{% static '/css/bootstrap.min.css' %}">
+        <link rel="stylesheet" type="text/css" href="{% static '/css/tag_cloud.css' %}">
     </head>
 
     <body>
@@ -26,28 +27,31 @@
                 </li>
             </ul>
 	    </nav>
-
-	    <div class="row justify-content-end mt-5 mr-3">
-            <div class="col-sm-8 p-2 w-75 bd-highlight mt-5">
+        <div class="row mt-5 mx-3">
+            <div class="col-9 p-2 bd-highlight mt-5">
 		  	        {% block content %}
 		  	        {% endblock %}
             </div>
-	        <div class="col-sm-4 p-2 w-25 bd-highlight mt-5">
-	  	        <div class="media">
-		  	        <div class="media-body">
-			            <h5 class="mt-0">Popular tags</h5>
-                        Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-		  	        </div>
-		        </div>
-		        <div class="media mt-4">
+	        <div class="col-3 p-2 bd-highlight mt-5">
+                <h5 class="mt-0">Popular tags</h5>
+                <ul class="cloud">
+                    <li>perl</li>
+                    <li>python</li>
+                    <li>TechnoPark</li>
+                    <li>MySQL</li>
+                    <li>django</li>
+                    <li>Mail.Ru</li>
+                    <li>Voloshin</li>
+                    <li>Firefox</li>
+                </ul>
+		        <div class="media mt-5">
 		  	        <div class="media-body">
 			            <h5 class="mt-0">Best members</h5>
 			             Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
 		  	        </div>
 		        </div>
 	        </div>
-	    </div>
-
+        </div>
         <script src="{% static '/js/jquery-3.4.1.slim.min.js' %}"></script>
         <script src="{% static '/js/bootstrap.bundle.min.js' %}"></script>
 
