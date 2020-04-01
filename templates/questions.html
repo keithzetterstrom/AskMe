@@ -2,25 +2,11 @@
 {% load static %}
 
 {% block content %}
-    {% for q in dct %}
+    {% for q in posts %}
         <div class="my-4">
         {% include 'inc/question.html' with dct_=q %}
         </div>
     {% endfor %}
-
-<div class="pagination mx-5">
- <span class="step-links">
-  {% if page.has_previous %}
-      <a href="?page={{ page.previous_page_number }}">Previous</a>
-  {% endif %}
-    <span class="current">
-  Page {{ page.number }} of {{ page.paginator.num_pages }}.
-    </span>
-  {% if page.has_next %}
-        <a href="?page={{ page.next_page_number }}">Next</a>
-  {% endif %}
-  </span>
-</div>
-
+{% include 'inc/pagination.html' with page=posts %}
 {% endblock %}
 

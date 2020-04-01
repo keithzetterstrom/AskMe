@@ -16,6 +16,7 @@ questions_dct = [
     {'id': 3, 'title': f'question # 3', 'text': f'text ))) 3', 'like': 7, 'data': '22.02.2020'},
     {'id': 4, 'title': f'question # 4', 'text': f'text ))) 4', 'like': 11, 'data': '22.02.2020'},
     {'id': 5, 'title': f'question # 5', 'text': f'text ))) 5', 'like': 0, 'data': '22.02.2020'},
+    {'id': 6, 'title': f'question # 6', 'text': f'text ))) 6', 'like': 6, 'data': '22.02.2020'},
 ]
 
 def index(request):
@@ -57,7 +58,8 @@ def questions(request):
     except EmptyPage:
         # Если страница больше максимальной, доставить последнюю страницу результатов
         posts = paginator.page(paginator.num_pages)
-    return render(request, 'questions.html', {'page': page, 'dct': posts})
+
+    return render(request, 'questions.html', {'page': page, 'posts': posts})
 
 
 def question(request, question_id):
