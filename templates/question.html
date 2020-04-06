@@ -6,13 +6,13 @@
 
     <div class="media mx-5 border-bottom border-secondary">
         <div class="col-2">
-            <img src="{% static 'img/1.jpg' %}" class="mr-3 img-fluid rounded" alt="..." >
+            <img src="{{dct.author.avatar.url}}" class="mr-3 img-fluid rounded" alt="..." >
 
         </div>
         <div class="col-10 media-body">
             <div class="text-left">
                 <h5 class="mt-0">{{ dct.title }}</h5>
-                <p class="clip" style=" word-wrap: break-word; height: auto; width: auto; text-overflow: ellipsis;">{{ dct.text }}11111111111111111111111111111111111111111111111111111111111111111111111111111111111111</p>
+                <p class="clip" style=" word-wrap: break-word; height: auto; width: auto; text-overflow: ellipsis;">{{ dct.question_text }}</p>
             </div>
             <div class="mb-3">
                 Tags: <a href="{% url 'ask_me:questions' %}" class="text-secondary"> answer</a>
@@ -20,13 +20,13 @@
         </div>
     </div>
 
-    <div class=" mx-5 border-bottom border-secondary">
+    {% comment %}<div class=" mx-5 border-bottom border-secondary">
         {% for i in dct %}
             <div class="my-3">
                 {% include 'inc/answer.html' with dct=dct %}
             </div>
         {% endfor %}
-    </div>
+    </div>{% endcomment %}
 
     <div class="col-8 my-4 mx-auto">
         <form action="">

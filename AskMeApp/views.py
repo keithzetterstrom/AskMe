@@ -1,6 +1,7 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from .models import Question
 
 # Create your views here.
 
@@ -18,6 +19,20 @@ questions_dct = [
     {'id': 5, 'title': f'question # 5', 'text': f'text ))) 5', 'like': 0, 'data': '22.02.2020'},
     {'id': 6, 'title': f'question # 6', 'text': f'text ))) 6', 'like': 6, 'data': '22.02.2020'},
 ]
+
+
+def create_paginator(request, data, elements_in_page, page):
+    paginator = Paginator(data, elements_in_page)  # 3 поста на каждой странице
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        # Если страница не является целым числом, поставим первую страницу
+        posts = paginator.page(1)
+    except EmptyPage:
+        # Если страница больше максимальной, доставить последнюю страницу результатов
+        posts = paginator.page(paginator.num_pages)
+    return posts
+
 
 def index(request):
     return HttpResponse('hello')
@@ -48,23 +63,15 @@ def ask(request):
 
 
 def questions(request):
-    paginator = Paginator(questions_dct, 3)  # 3 поста на каждой странице
+    questions_new = Question.objects.get_new_questions()
     page = request.GET.get('page')
-    try:
-        posts = paginator.page(page)
-    except PageNotAnInteger:
-        # Если страница не является целым числом, поставим первую страницу
-        posts = paginator.page(1)
-    except EmptyPage:
-        # Если страница больше максимальной, доставить последнюю страницу результатов
-        posts = paginator.page(paginator.num_pages)
-
+    posts = create_paginator(request, questions_new, 20, page)
     return render(request, 'questions.html', {'page': page, 'posts': posts})
 
 
 def question(request, question_id):
 
-    return render(request, 'question.html', {'dct': questions_dct[int(question_id)]})
+    return render(request, 'question.html', {'dct': get_object_or_404(Question, pk=question_id)})
 
 
 def hot(request):

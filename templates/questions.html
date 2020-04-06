@@ -2,11 +2,15 @@
 {% load static %}
 
 {% block content %}
-    {% for q in posts %}
-        <div class="my-4">
-        {% include 'inc/question.html' with dct_=q %}
-        </div>
-    {% endfor %}
-{% include 'inc/pagination.html' with page=posts %}
+    {% if posts %}
+        {% for q in posts %}
+            <div class="my-4">
+            {% include 'inc/question.html' with dct_=q %}
+            </div>
+        {% endfor %}
+        {% include 'inc/pagination.html' with page=posts %}
+    {% else %}
+        Nothing to show :(
+    {% endif %}
 {% endblock %}
 

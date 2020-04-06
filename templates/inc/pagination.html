@@ -1,15 +1,44 @@
 
 
-<div class="pagination mx-5">
- <span class="step-links">
-  {% if page.has_previous %}
-      <a href="?page={{ page.previous_page_number }}">Previous</a>
-  {% endif %}
-    <span class="current">
-  Page {{ page.number }} of {{ page.paginator.num_pages }}.
-    </span>
-  {% if page.has_next %}
-        <a href="?page={{ page.next_page_number }}">Next</a>
-  {% endif %}
-  </span>
+<div class="text-center mx-5">
+    <ul id="dynamic-total-pages-pagination" class="pagination-sm pagination">
+        <li class="page-item first"><a href="?page=1" class="page-link badge-light">First</a></li>
+        {% if page.has_previous %}
+            <li class="page-item prev"><a href="?page={{ page.previous_page_number }}" class="page-link badge-light">Previous</a></li>
+        {% endif %}
+        {% for num in page.paginator.page_range %}
+            <li class="page-item"><a href="?page={{ num }}" class="page-link badge-light">{{num}}</a></li>
+        {% endfor %}
+        {% if page.has_next %}
+            <li class="page-item next"><a href="?page={{ page.next_page_number }}" class="page-link badge-light">Next</a></li>
+        {% endif %}
+        <li class="page-item last"><a href="?page={{ page.paginator.num_pages }}" class="page-link badge-light">Last</a></li>
+    </ul>
 </div>
+
+
+{% comment %}
+<div class="pagination">
+    {% if page.has_previous %}
+        <a class="pagination-action" href="?page=1">
+            <i class="fa fa-angle-double-left" aria-hidden="true"></i> </a>
+        <a class="pagination-action" href="?page={{ page.previous_page_number }}">
+            <i class="fa fa-angle-left" aria-hidden="true"></i>
+        </a>
+    {% endif %}
+    {% for num in page.paginator.page_range %}
+        {% if page.number == num %}
+            <span class="pagination-number pagination-current">{{ num }}</span>
+        {% elif num > page.number|add:'-3' and num < page.number|add:'3' %}
+            <a class="pagination-number" href="?page={{ num }}">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if page.has_next %}
+        <a class="pagination-action" href="?page={{ page.next_page_number }}">
+            <i class="fa fa-angle-right" aria-hidden="true"></i>
+        </a>
+        <a class="pagination-action" href="?page={{ page.paginator.num_pages }}">
+            <i class="fa fa-angle-double-right" aria-hidden="true"></i>
+        </a>1
+    {% endif %}
+</div>{% endcomment %}

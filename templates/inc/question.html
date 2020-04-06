@@ -2,15 +2,12 @@
 
 <div class="media cal-8 mx-5 border border-secondary rounded">
         <div class="col-2">
-            <img src="{% static 'img/1.jpg' %}" class="mt-2 mr-3 img-fluid rounded" alt="..." >
-            <div class="">
-
-            </div>
+            <img src="{{dct_.author.avatar.url}}" class="mt-2 mr-3 img-fluid rounded" alt="..." >
         </div>
         <div class="col-10 media-body">
             <div>
                 <h5 class="mt-0" style="text-decoration: underline;"><a href="{% url 'ask_me:question' dct_.id %}"  class="text-secondary"> {{dct_.title}} </a></h5>
-                <p class="clip" style="height: 50px; overflow: hidden; text-overflow: ellipsis;"> {{dct_.text}} </p>
+                <p class="clip" style="height: 50px; overflow: hidden; text-overflow: ellipsis;"> {{dct_.question_text}} </p>
             </div>
             <div>
                 <a href="{% url 'ask_me:question' dct_.id %}" class="text-secondary"> answer</a>
