@@ -10,9 +10,9 @@ class Command(BaseCommand):
     help = 'filldb'
 
     def add_arguments(self, parser):
-        parser.add_argument('--authors', type=int)
+        # parser.add_argument('--authors', type=int)
         parser.add_argument('--questions', type=int)
-        #parser.add_argument('--answers', type=int)
+        # parser.add_argument('--answers', type=int)
 
     def fill_authors(self, cnt):
         for i in range(cnt):
@@ -37,6 +37,6 @@ class Command(BaseCommand):
             )
 
     def handle(self, *args, **options):
-        #self.fill_authors(options.get('authors', 0))
+        # self.fill_authors(options.get('authors', 0))
         self.fill_questions(options.get('questions', 0))
         # self.fill_answers(answers_cnt)
