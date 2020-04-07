@@ -39,11 +39,7 @@ def index(request):
 
 
 def authorisation(request):
-    return render(request, 'base_authorised.html')
-
-
-def unauthorisation(request):
-    return render(request, 'base_unauthorised.html')
+    return render(request, 'base.html', {'auth': 1})
 
 
 def login(request):

@@ -18,15 +18,8 @@
         <button class="btn btn-secondary col-auto col-lg-1 ml-2" type="submit">Ask!</button>
     </form>
 
-    <ul class="navbar-nav col-auto ml-5">
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'ask_me:login' %}">Sign In</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" href="{% url 'ask_me:sign_up' %}">Sign Up</a>
-        </li>
-    </ul>
-    {% comment %}<div class="container col-auto ml-5 mr-2 mr-md-4">
+    {% if auth %}
+        <div class="container col-auto ml-5 mr-2 mr-md-4">
                 <img class="img rounded" src="{% static '/img/avatar.jpg' %}">
                 <div class="navbar-text ml-4">
                     <div class="row">Vasya Pupkin</div>
@@ -35,7 +28,18 @@
                         <a class="ml-3" href="#home">log out</a>
                     </div>
                 </div>
-            </div>{% endcomment %}
+            </div>
+    {% else %}
+        <ul class="navbar-nav col-auto ml-5">
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'ask_me:login' %}">Sign In</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" href="{% url 'ask_me:sign_up' %}">Sign Up</a>
+        </li>
+        </ul>
+    {%  endif %}
+
 </nav>
 <div class="row mt-5 mx-3">
     <div class="col-9 p-2 bd-highlight mt-5">

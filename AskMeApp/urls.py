@@ -5,8 +5,7 @@ from . import views
 app_name = 'ask_me'
 urlpatterns = [
     url(r'^index/$', views.index, name='index'),
-    url(r'^auth/$', views.authorisation, name='auth'),
-    url(r'^unauth/$', views.unauthorisation, name='unauth'),
+    url(r'^auth/$', views.authorisation, name='unauth'),
     url(r'^login/$', views.login, name='login'),
     url(r'^signup/$', views.sign_up, name='sign_up'),
     url(r'^settings/$', views.settings, name='settings'),
