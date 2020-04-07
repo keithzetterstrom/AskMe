@@ -15,7 +15,7 @@
                 <p class="clip" style=" word-wrap: break-word; height: auto; width: auto; text-overflow: ellipsis;">{{ dct.question_text }}</p>
             </div>
             <div class="mb-3">
-                Tags: <a href="{% url 'ask_me:questions' %}" class="text-secondary"> answer</a>
+                Tags: {% comment %}<a href="{% url 'ask_me:questions' %}" class="text-secondary"> answer</a>{% endcomment %}
             </div>
         </div>
     </div>
