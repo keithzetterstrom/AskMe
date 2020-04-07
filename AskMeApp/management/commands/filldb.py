@@ -10,7 +10,7 @@ class Command(BaseCommand):
     help = 'filldb'
 
     def add_arguments(self, parser):
-        parser.add_argument('--authors', type=int)
+        #parser.add_argument('--authors', type=int)
         parser.add_argument('--questions', type=int)
         #parser.add_argument('--answers', type=int)
 
