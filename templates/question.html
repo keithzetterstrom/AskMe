@@ -20,13 +20,13 @@
         </div>
     </div>
 
-    {% comment %}<div class=" mx-5 border-bottom border-secondary">
-        {% for i in dct %}
+    <div class=" mx-5 border-bottom border-secondary">
+        {% for i in answers %}
             <div class="my-3">
-                {% include 'inc/answer.html' with dct=dct %}
+                {% include 'inc/answer.html' with answers=answers %}
             </div>
         {% endfor %}
-    </div>{% endcomment %}
+    </div>
 
     <div class="col-8 my-4 mx-auto">
         <form action="">

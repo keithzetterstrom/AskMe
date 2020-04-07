@@ -21,8 +21,8 @@ questions_dct = [
 ]
 
 
-def create_paginator(request, data, elements_in_page, page):
-    paginator = Paginator(data, elements_in_page)  # 3 поста на каждой странице
+def create_paginator(data, elements_in_page, page):
+    paginator = Paginator(data, elements_in_page)  # поста на каждой странице
     try:
         posts = paginator.page(page)
     except PageNotAnInteger:
@@ -50,7 +50,7 @@ def login(request):
     return render(request, 'login.html')
 
 
-def sing_up(request):
+def sign_up(request):
     return render(request, 'signup.html')
 
 
@@ -65,14 +65,13 @@ def ask(request):
 def questions(request):
     questions_new = Question.objects.get_new_questions()
     page = request.GET.get('page')
-    posts = create_paginator(request, questions_new, 20, page)
+    posts = create_paginator(questions_new, 20, page)
     return render(request, 'questions.html', {'page': page, 'posts': posts})
 
 
 def question(request, question_id):
+    return render(request, 'question.html', {'dct': get_object_or_404(Question, pk=question_id), 'answers': questions_dct})
 
-    return render(request, 'question.html', {'dct': get_object_or_404(Question, pk=question_id)})
 
-
-def hot(request):
+def tag(request):
     return render(request, 'questions.html')

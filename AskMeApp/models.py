@@ -29,7 +29,7 @@ class Question(models.Model):
     question_text = models.TextField(verbose_name=u"Текст вопроса")
     make_time = models.DateTimeField(default=datetime.now, verbose_name=u"Время создания")
     author = models.ForeignKey(User, on_delete=models.CASCADE) #удалить объект, если удален объект автора
-    #tags = models.ManyToManyField(Tag, blank=True)
+    tags = models.ManyToManyField(Tag, blank=True)
     objects = QuestionManager()
 
     def __str__(self):

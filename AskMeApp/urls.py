@@ -8,10 +8,10 @@ urlpatterns = [
     url(r'^auth/$', views.authorisation, name='auth'),
     url(r'^unauth/$', views.unauthorisation, name='unauth'),
     url(r'^login/$', views.login, name='login'),
-    url(r'^signup/$', views.sing_up, name='sing_up'),
+    url(r'^signup/$', views.sign_up, name='sign_up'),
     url(r'^settings/$', views.settings, name='settings'),
     url(r'^ask/$', views.ask, name='ask'),
     url(r'^$', views.questions, name='questions'),
     url(r'^question/(?P<question_id>\d+)/$', views.question, name='question'),
-    url(r'^hot/$', views.hot, name='hot'),
+    url(r'^tag/$', views.tag, name='hot'),
 ]
