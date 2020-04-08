@@ -2,17 +2,25 @@
 
 <div class="text-center mx-5">
     <ul id="dynamic-total-pages-pagination" class="pagination-sm pagination">
-        <li class="page-item first"><a href="?page=1" class="page-link badge-light">First</a></li>
         {% if page.has_previous %}
+            <li class="page-item first"><a href="?page=1" class="page-link badge-light">1</a></li>
             <li class="page-item prev"><a href="?page={{ page.previous_page_number }}" class="page-link badge-light">Previous</a></li>
         {% endif %}
         {% for num in page.paginator.page_range %}
-            <li class="page-item"><a href="?page={{ num }}" class="page-link badge-light">{{num}}</a></li>
+            {% if num >= page.previous_page_number and num < page.number and num != 1%}
+                <li class="page-item"><a href="?page={{ num }}" class="page-link badge-light">{{num}}</a></li>
+            {% endif %}
+            {% if num == page.number %}
+                <li class="page-item"><a href="?page={{ num }}" class="page-link badge-secondary">{{num}}</a></li>
+            {% endif %}
+            {% if num <= page.next_page_number and num > page.number and page.next_page_number != page.paginator.num_pages %}
+                <li class="page-item"><a href="?page={{ num }}" class="page-link badge-light">{{num}}</a></li>
+            {% endif %}
         {% endfor %}
         {% if page.has_next %}
             <li class="page-item next"><a href="?page={{ page.next_page_number }}" class="page-link badge-light">Next</a></li>
+            <li class="page-item last"><a href="?page={{ page.paginator.num_pages }}" class="page-link badge-light">{{ page.paginator.num_pages }}</a></li>
         {% endif %}
-        <li class="page-item last"><a href="?page={{ page.paginator.num_pages }}" class="page-link badge-light">Last</a></li>
     </ul>
 </div>
 
