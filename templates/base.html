@@ -1,4 +1,5 @@
 {% load static %}
+{% load tag_load %}
 
 <!doctype html>
 <html lang="en">
@@ -15,7 +16,7 @@
     <a class="navbar-brand ml-md-4" href="{% url 'ask_me:questions' %}">AskMe</a>
     <form class="container form-inline ml-md-4">
         <input class="form-control col-11" type="text" placeholder="Search" aria-label="Search">
-        <button class="btn btn-secondary col-auto col-lg-1 ml-2" type="submit">Ask!</button>
+        <a class="btn btn-secondary col-auto col-lg-1 ml-2" href="{% url 'ask_me:ask' %}">Ask!</a>
     </form>
 
     {% if auth %}
@@ -24,7 +25,7 @@
                 <div class="navbar-text ml-4">
                     <div class="row">Vasya Pupkin</div>
                     <div class="row">
-                        <a href="#home">settings</a>
+                        <a href="{% url 'ask_me:settings' %}">settings</a>
                         <a class="ml-3" href="#home">log out</a>
                     </div>
                 </div>
@@ -49,14 +50,7 @@
     <div class="col-3 p-2 bd-highlight mt-5">
         <h5 class="mt-0">Popular tags</h5>
         <ul class="cloud">
-            <li>perl</li>
-            <li>python</li>
-            <li>TechnoPark</li>
-            <li>MySQL</li>
-            <li>django</li>
-            <li>Mail.Ru</li>
-            <li>Voloshin</li>
-            <li>Firefox</li>
+            {% show_results %}
         </ul>
 
 {#        <h5 class="mt-5">Best members</h5>#}

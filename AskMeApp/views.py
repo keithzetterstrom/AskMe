@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -65,18 +66,20 @@ def questions(request):
     posts = create_paginator(questions_qs, 20, page)
 
     context = {'page': page,
-               'posts': posts}
+               'posts': posts,
+               'status': 1}
     return render(request, 'questions.html', context)
 
 
 def question(request, question_id):
-    question_obj = get_object_or_404(Question, pk=question_id)
+    question_obj = Question.objects.get_question_by_id(question_id)
     answers_qs = question_obj.answer_set.all()
 
     page = request.GET.get('page')
-    posts = create_paginator(answers_qs, 5, page)
+    posts = create_paginator(answers_qs, 4, page)
+    print(question_obj.tags)
 
-    context = {'dct': question_obj,
+    context = {'question': question_obj,
                'answers': posts,
                'page': page}
     return render(request, 'question.html', context)
@@ -84,10 +87,24 @@ def question(request, question_id):
 
 def tag(request, tag_id):
     questions_qs = Question.objects.get_questions_by_tag(tag_id)
+    print(questions_qs[1].rating)
 
     page = request.GET.get('page')
     posts = create_paginator(questions_qs, 20, page)
 
     context = {'page': page,
-               'posts': posts}
+               'posts': posts,
+               'status': 0}
+    return render(request, 'questions.html', context)
+
+
+def hot(request):
+    questions_qs = Question.objects.get_questions_by_rating()
+
+    page = request.GET.get('page')
+    posts = create_paginator(questions_qs, 20, page)
+
+    context = {'page': page,
+               'posts': posts,
+               'status': 0}
     return render(request, 'questions.html', context)

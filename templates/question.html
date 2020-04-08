@@ -6,9 +6,9 @@
 
     <div class="media mx-5 border-bottom border-secondary">
         <div class="col-auto">
-            <img src="{{dct.author.avatar.url}}" class="img-fluid rounded" alt="..." >
+            <img src="{{question.author.avatar.url}}" class="img-fluid rounded" alt="..." >
             <p class="text-center font-weight-bold mt-4 mb-1">
-                100500
+                {{ question.rating }}
             </p>
             <div class="row mx-auto">
                 <a href=""><img src="{% static 'img/like.png' %}" class="mx-1"></a>
@@ -17,27 +17,30 @@
         </div>
         <div class="col-auto media-body">
             <div class="text-left">
-                <h5 class="mt-0">{{ dct.title }}</h5>
-                <p class="text-secondary">by Aleksandr Dergachev</p>
-                <p class="clip" style=" word-wrap: break-word; height: auto; width: auto; text-overflow: ellipsis;">{{ dct.question_text }}</p>
+                <h5 class="mt-0">{{ question.title }}</h5>
+                <p class="text-secondary">{{question.author.username}}</p>
+                <p class="clip" style=" word-wrap: break-word; height: auto; width: auto; text-overflow: ellipsis;">{{ question.question_text }}</p>
             </div>
             <div class="mb-3">
                 Tags:
                 <span class="mr-2"></span>
-                <a href="" class="badge badge-secondary">perl</a>
-                <a href="" class="badge badge-secondary">python</a>
-                <a href="" class="badge badge-secondary">Voloshin</a>
-                <p class="text-right text-secondary m-0">21.04.2020 at 4:20</p>
+                {% for tag in question.tags.all %}
+                    <a href="{% url 'ask_me:tag' tag.id %}" class="badge badge-secondary">{{ tag.tag_name }}</a>
+                {% endfor %}
+                <p class="text-right text-secondary m-0">{{ question.make_time }}</p>
             </div>
         </div>
     </div>
 
     <div class=" mx-5 border-bottom border-secondary">
-        {% for i in answers %}
-            <div class="my-3">
-                {% include 'inc/answer.html' with answers=answers %}
-            </div>
-        {% endfor %}
+        {% if answers %}
+            {% for answer in answers %}
+                <div class="my-3">
+                    {% include 'inc/answer.html' with answer=answer %}
+                </div>
+            {% endfor %}
+            {% include 'inc/pagination.html' with page=answers %}
+        {% endif %}
     </div>
 
     <div class="col-8 my-4 mx-auto">

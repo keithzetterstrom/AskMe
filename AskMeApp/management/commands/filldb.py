@@ -1,19 +1,24 @@
 from django.core.management.base import BaseCommand
-from AskMeApp.models import Question, User, Answer
-from random import choice
+from AskMeApp.models import Question, User, Answer, Tag, Like
+from random import choice, random
 from faker import Faker
 
 f = Faker()
+tags_lst = ['Python', 'SQl', 'C++', 'Django', 'PyCharm', 'C', 'C#', 'JavaScript', 'Java', 'HTML', 'CSS', 'MySQL']
 
 
 class Command(BaseCommand):
     help = 'filldb'
 
     def add_arguments(self, parser):
-
-        # parser.add_argument('--authors', type=int)
+        parser.add_argument('--authors', type=int)
         parser.add_argument('--questions', type=int)
-        # parser.add_argument('--answers', type=int)
+        parser.add_argument('--answers', type=int)
+        parser.add_argument('--tags',  action='store_true')
+
+    def fill_tags(self):
+        for t in tags_lst:
+            Tag.objects.create(tag_name=t)
 
     def fill_authors(self, cnt):
         for i in range(cnt):
@@ -21,32 +26,49 @@ class Command(BaseCommand):
             u.save()
 
     def fill_questions(self, cnt):
-        author_ids = list(
-            User.objects.values_list(
-                'id', flat=True
-            )
-        )
+        author_ids = list(User.objects.values_list('id', flat=True))
+        tag_ids = list(Tag.objects.values_list('id', flat=True))
+        vote = (1, -1)
+
         for i in range(cnt):
-            Question.objects.create(
+            q = Question(
                 author=User(choice(author_ids)),
                 question_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
                 title=f.sentence()[:200],
+                #likes=Like(user=User(choice(author_ids)), vote=choice(vote))
             )
+
+            q.save()
+            q.tags.add(choice(tag_ids))
+            q.tags.add(choice(tag_ids))
+            q.likes.create(user=User(choice(author_ids)), vote=choice(vote))
 
     def fill_answers(self, cnt):
         author_ids = list(User.objects.values_list('id', flat=True))
-
         questions_ids = list(Question.objects.values_list('id', flat=True))
+        vote = (1, -1)
 
         for i in range(cnt):
-            Answer.objects.create(
+            a = Answer(
                 author=User(choice(author_ids)),
                 answer_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
-                title=f.sentence()[:200],
-                question=Question(choice(questions_ids))
+                question=Question(choice(questions_ids)),
+                #likes=Like(user=User(choice(author_ids)), vote=choice(vote))
             )
 
+            a.save()
+            a.likes.create(user=User(choice(author_ids)), vote=choice(vote))
+
     def handle(self, *args, **options):
-        # self.fill_authors(options.get('authors', 0))
-        self.fill_questions(options.get('questions', 0))
-        #self.fill_answers(options.get('questions', 0))
+
+        authors = options['authors']
+        questions = options['questions']
+        answers = options['answers']
+        if authors:
+            self.fill_authors(authors)
+        if questions:
+            self.fill_questions(questions)
+        if answers:
+            self.fill_answers(answers)
+        if options['tags']:
+            self.fill_tags()

@@ -3,16 +3,34 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count, Sum
 
 
 class QuestionManager(models.Manager):
     def get_new_questions(self):
-        new_questions = self.get_queryset().all().order_by('-make_time')
+        new_questions = self.get_queryset().all().order_by('-make_time').annotate(num_answer=Count('answer'),
+                                                                                  rating=Sum('likes__vote'))
         return new_questions
 
     def get_questions_by_tag(self, tag):
-        questions_by_tag = self.objects.filter(tags__id=tag)
+        questions_by_tag = self.get_queryset().order_by('-make_time').filter(tags__id=tag).annotate(num_answer=Count('answer'),
+                                                                                                    rating=Sum('likes__vote'))
         return questions_by_tag
+
+    def get_questions_by_rating(self):
+        questions_by_tag = self.get_queryset().annotate(num_answer=Count('answer'),
+                                                        rating=Sum('likes__vote')).order_by('-rating')
+        return questions_by_tag
+
+    def get_question_by_id(self, question_id):
+        question_by_id = self.get_queryset().annotate(rating=Sum('likes__vote')).get(id=question_id)
+        return question_by_id
+
+class LikeDislikeManager(models.Manager):
+    use_for_related_fields = True
+
+    def sum_rating(self):
+        return self.get_queryset().aggregate(Sum('vote')).get('vote__sum') or 0
 
 
 class User(AbstractUser):
@@ -36,7 +54,7 @@ class Like(models.Model):
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
 
-    #objects = LikeDislikeManager()
+    objects = LikeDislikeManager()
 
 
 class Question(models.Model):
@@ -46,6 +64,7 @@ class Question(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE) #удалить объект, если удален объект автора
     tags = models.ManyToManyField(Tag, blank=True)
     likes = GenericRelation(Like)
+    #rating =
     objects = QuestionManager()
 
     def __str__(self):
@@ -59,6 +78,7 @@ class Answer(models.Model):
     correct_mark = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     likes = GenericRelation(Like)
+    #rating =
 
     def __str__(self):
         return f'Answer(pk={self.pk})'

@@ -3,13 +3,18 @@
 
 {% block content %}
     <h2 class="mb-5 ml-4">
+    {% if status %}
         <span class="text-secondary mr-2"> New questions </span>
-        <a href="" style="font-size: smaller; text-decoration: underline;" class="text-primary"> hot questions </a>
+        <a href="{% url 'ask_me:hot' %}" style="font-size: smaller; text-decoration: underline;" class="text-primary"> hot questions </a>
+    {% else %}
+        <span class="text-secondary mr-2"> Hot questions </span>
+        <a href="{% url 'ask_me:questions'%}" style="font-size: smaller; text-decoration: underline;" class="text-primary"> new questions </a>
+    {% endif %}
     </h2>
     {% if posts %}
         {% for q in posts %}
             <div class="my-4">
-            {% include 'inc/question.html' with dct_=q %}
+            {% include 'inc/question.html' with question=q %}
             </div>
         {% endfor %}
         {% include 'inc/pagination.html' with page=posts %}
