@@ -1,18 +1,31 @@
 {% load static %}
 
 <div class="media mx-5 border border-secondary rounded">
-        <div class="col-2">
-            <img src="{{dct_.author.avatar.url}}" class="mt-2 mr-3 img-fluid rounded" alt="..." >
+        <div class="col-auto mt-3">
+            <img src="{{dct_.author.avatar.url}}" class="img-fluid rounded" alt="...">
+            <p class="text-center font-weight-bold mt-4 mb-1">
+                100500
+            </p>
+            <div class="row mx-auto">
+                <a href=""><img src="{% static 'img/like.png' %}" class="mx-1"></a>
+                <a href=""><img src="{% static 'img/dislike.png' %}" class="mx-1"></a>
+            </div>
+
         </div>
-        <div class="col-10 my-3 media-body">
+        <div class="col-auto my-3 media-body">
             <div>
-                <h5 class="mt-0" style="text-decoration: underline;"><a href="{% url 'ask_me:question' dct_.id %}"  class="text-secondary"> {{dct_.title}} </a></h5>
-                <p class="font-weight-light">by Aleksandr Dergachev </p>
+                <h5 class="mt-0" style="text-decoration: underline;"><a href="{% url 'ask_me:question' dct_.id %}"  class="text-dark"> {{dct_.title}} </a></h5>
+                <p class="text-secondary">by Aleksandr Dergachev</p>
                 <p class="clip" style="height: 50px; overflow: hidden; text-overflow: ellipsis;">{{dct_.question_text}} </p>
             </div>
             <div>
-                <a href="{% url 'ask_me:question' dct_.id %}" class="text-secondary"> answer</a>
-                <p class="text-right font-weight-light m-0">21.04.2020</p>
+                <a href="{% url 'ask_me:question' dct_.id %}" class="text-secondary mr-5">answer (5)</a>
+                Tags:
+                <span class="mr-2"></span>
+                <a href="" class="badge badge-secondary">perl</a>
+                <a href="" class="badge badge-secondary">python</a>
+                <a href="" class="badge badge-secondary">Voloshin</a>
+                <p class="text-right text-secondary m-0">21.04.2020 at 4:20</p>
             </div>
         </div>
 </div>

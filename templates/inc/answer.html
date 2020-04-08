@@ -2,16 +2,28 @@
 
 <div class="media mx-5 border border-secondary rounded">
     <div class="row mx-2 my-2">
-        <div class="col-2">
-            <img src="{% static 'img/1.jpg' %}" class="mr-3 img-fluid rounded" alt="..." >
+        <div class="col-auto">
+            <img src="{% static 'img/1.jpg' %}" class="img-fluid rounded" alt="..." >
+            <p class="text-center font-weight-bold mt-3 mb-1">
+                100500
+            </p>
+            <div class="row mx-auto">
+                <a href=""><img src="{% static 'img/like.png' %}" class="mx-1"></a>
+                <a href=""><img src="{% static 'img/dislike.png' %}" class="mx-1"></a>
+            </div>
         </div>
-        <div class="col-10 media-body">
+        <div class="col-auto media-body">
             <div>
-                <h5 class="mt-0" style="text-decoration: underline;"><a href="{% url 'ask_me:questions' %}"  class="text-secondary"> Media heading </a></h5>
-                <p class="clip" style="height: 100px; overflow: hidden; text-overflow: ellipsis;">Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.</p>
+                <h6 class="text-dark mt-2">
+                    Aleksandr Dergachev
+                </h6>
+                <p class="text-break">
+                    Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+                </p>
             </div>
             <div>
                 <input type="checkbox"> Correct!
+                <p class="text-right text-secondary m-0">21.04.2020 at 4:20</p>
             </div>
         </div>
     </div>
