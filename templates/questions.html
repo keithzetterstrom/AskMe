@@ -2,6 +2,10 @@
 {% load static %}
 
 {% block content %}
+    <h2 class="mb-5 ml-4">
+        <span class="text-secondary mr-2"> New questions </span>
+        <a href="" style="font-size: smaller; text-decoration: underline;" class="text-primary"> hot questions </a>
+    </h2>
     {% if posts %}
         {% for q in posts %}
             <div class="my-4">
