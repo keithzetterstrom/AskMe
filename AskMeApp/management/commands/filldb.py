@@ -35,7 +35,6 @@ class Command(BaseCommand):
                 author=User(choice(author_ids)),
                 question_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
                 title=f.sentence()[:200],
-                #likes=Like(user=User(choice(author_ids)), vote=choice(vote))
             )
 
             q.save()
@@ -53,7 +52,6 @@ class Command(BaseCommand):
                 author=User(choice(author_ids)),
                 answer_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
                 question=Question(choice(questions_ids)),
-                #likes=Like(user=User(choice(author_ids)), vote=choice(vote))
             )
 
             a.save()

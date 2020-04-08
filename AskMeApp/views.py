@@ -1,4 +1,4 @@
-from django.db.models import Count
+from django.db.models import Count, Sum
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -73,7 +73,7 @@ def questions(request):
 
 def question(request, question_id):
     question_obj = Question.objects.get_question_by_id(question_id)
-    answers_qs = question_obj.answer_set.all()
+    answers_qs = question_obj.answer_set.all().annotate(rating=Sum('likes__vote'))
 
     page = request.GET.get('page')
     posts = create_paginator(answers_qs, 4, page)
