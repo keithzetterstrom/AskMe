@@ -1,7 +1,7 @@
 from django.shortcuts import render, get_object_or_404
 from django.http import HttpResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .models import Question
+from .models import Question, Answer
 
 # Create your views here.
 
@@ -59,15 +59,35 @@ def ask(request):
 
 
 def questions(request):
-    questions_new = Question.objects.get_new_questions()
+    questions_qs = Question.objects.get_new_questions()
+
     page = request.GET.get('page')
-    posts = create_paginator(questions_new, 20, page)
-    return render(request, 'questions.html', {'page': page, 'posts': posts})
+    posts = create_paginator(questions_qs, 20, page)
+
+    context = {'page': page,
+               'posts': posts}
+    return render(request, 'questions.html', context)
 
 
 def question(request, question_id):
-    return render(request, 'question.html', {'dct': get_object_or_404(Question, pk=question_id), 'answers': questions_dct})
+    question_obj = get_object_or_404(Question, pk=question_id)
+    answers_qs = question_obj.answer_set.all()
+
+    page = request.GET.get('page')
+    posts = create_paginator(answers_qs, 5, page)
+
+    context = {'dct': question_obj,
+               'answers': posts,
+               'page': page}
+    return render(request, 'question.html', context)
 
 
-def tag(request):
-    return render(request, 'questions.html')
+def tag(request, tag_id):
+    questions_qs = Question.objects.get_questions_by_tag(tag_id)
+
+    page = request.GET.get('page')
+    posts = create_paginator(questions_qs, 20, page)
+
+    context = {'page': page,
+               'posts': posts}
+    return render(request, 'questions.html', context)

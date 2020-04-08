@@ -12,5 +12,5 @@ urlpatterns = [
     url(r'^ask/$', views.ask, name='ask'),
     url(r'^$', views.questions, name='questions'),
     url(r'^question/(?P<question_id>\d+)/$', views.question, name='question'),
-    url(r'^tag/$', views.tag, name='hot'),
+    url(r'^tag/(?P<tag_id>\d+)/$', views.tag, name='tag'),
 ]
