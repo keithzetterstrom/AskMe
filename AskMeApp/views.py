@@ -86,9 +86,8 @@ def question(request, question_id):
     return render(request, 'question.html', context)
 
 
-def tag(request, tag_id):
-    questions_qs = Question.objects.get_questions_by_tag(tag_id)
-    print(questions_qs[1].rating)
+def tag(request, tag_name):
+    questions_qs = Question.objects.get_questions_by_tag(tag_name)
 
     page = request.GET.get('page')
     posts = create_paginator(questions_qs, 20, page)

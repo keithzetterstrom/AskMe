@@ -14,7 +14,7 @@ class QuestionManager(models.Manager):
 
     def get_questions_by_tag(self, tag):
         questions_by_tag = self.get_queryset().order_by('-make_time')\
-            .filter(tags__id=tag).annotate(num_answer=Count('answer'),
+            .filter(tags__tag_name=tag).annotate(num_answer=Count('answer'),
                                            rating=Sum('likes_question__vote', distinct=True))
         return questions_by_tag
 

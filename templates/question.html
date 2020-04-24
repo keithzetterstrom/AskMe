@@ -25,7 +25,7 @@
                 Tags:
                 <span class="mr-2"></span>
                 {% for tag in question.tags.all %}
-                    <a href="{% url 'ask_me:tag' tag.id %}" class="badge badge-secondary">{{ tag.tag_name }}</a>
+                    <a href="{% url 'ask_me:tag' tag.tag_name %}" class="badge badge-secondary">{{ tag.tag_name }}</a>
                 {% endfor %}
                 <p class="text-right text-secondary m-0">{{ question.make_time }}</p>
             </div>
