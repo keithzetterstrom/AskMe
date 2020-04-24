@@ -36,7 +36,6 @@ class Command(BaseCommand):
                 question_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
                 title=f.sentence()[:200],
             )
-
             q.save()
             q.tags.add(choice(tag_ids))
             q.tags.add(choice(tag_ids))
@@ -57,16 +56,22 @@ class Command(BaseCommand):
             a.save()
             a.likes.create(user=User(choice(author_ids)), vote=choice(vote))
 
+    def fill_likes(self):
+        author_ids = list(User.objects.values_list('id', flat=True))
+        questions_ids = list(Question.objects.values_list('id', flat=True))
+        questions_ids = list(Answer.objects.values_list('id', flat=True))
+
     def handle(self, *args, **options):
 
         authors = options['authors']
         questions = options['questions']
         answers = options['answers']
+        if options['tags']:
+            self.fill_tags()
         if authors:
             self.fill_authors(authors)
         if questions:
             self.fill_questions(questions)
         if answers:
             self.fill_answers(answers)
-        if options['tags']:
-            self.fill_tags()
+

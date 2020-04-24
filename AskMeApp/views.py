@@ -1,25 +1,10 @@
+from django.contrib.auth import authenticate, login
 from django.db.models import Count, Sum
 from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from .models import Question, Answer
-
-# Create your views here.
-
-# questions_dct = {
-#     i: {'id': i, 'title': f'question # {i}', 'text': f'text ))) {i}'}
-#     for i in range(5)
-# }
-
-questions_dct = [
-    {'id': 0, 'title': f'question # 0', 'text': f'text ))) 0', 'like': 1, 'data': '22.02.2020'},
-    {'id': 1, 'title': f'question # 1', 'text': f'text ))) 1', 'like': 2, 'data': '22.02.2020'},
-    {'id': 2, 'title': f'question # 2', 'text': f'text ))) 2', 'like': 4, 'data': '22.02.2020'},
-    {'id': 3, 'title': f'question # 3', 'text': f'text ))) 3', 'like': 7, 'data': '22.02.2020'},
-    {'id': 4, 'title': f'question # 4', 'text': f'text ))) 4', 'like': 11, 'data': '22.02.2020'},
-    {'id': 5, 'title': f'question # 5', 'text': f'text ))) 5', 'like': 0, 'data': '22.02.2020'},
-    {'id': 6, 'title': f'question # 6', 'text': f'text ))) 6', 'like': 6, 'data': '22.02.2020'},
-]
+from .forms import LoginForm
 
 
 def create_paginator(data, elements_in_page, page):
@@ -43,8 +28,24 @@ def authorisation(request):
     return render(request, 'base.html', {'auth': 1})
 
 
-def login(request):
-    return render(request, 'login.html')
+def sign_in(request):
+    if request.method == 'POST':
+        form = LoginForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user = authenticate(username=cd['username'], password=cd['password'])
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    next_page = request.POST.get('next', '/')
+                    return HttpResponseRedirect(next_page)
+                else:
+                    return HttpResponse('Disabled account')
+            else:
+                return HttpResponse('Invalid login')
+    else:
+        form = LoginForm()
+    return render(request, 'login.html', {'form': form})
 
 
 def sign_up(request):
@@ -73,7 +74,7 @@ def questions(request):
 
 def question(request, question_id):
     question_obj = Question.objects.get_question_by_id(question_id)
-    answers_qs = question_obj.answer_set.all().annotate(rating=Sum('likes__vote'))
+    answers_qs = question_obj.answer_set.all().annotate(rating=Sum('likes_answer__vote'))
 
     page = request.GET.get('page')
     posts = create_paginator(answers_qs, 4, page)

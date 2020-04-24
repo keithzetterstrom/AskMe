@@ -8,23 +8,27 @@ from django.db.models import Count, Sum
 
 class QuestionManager(models.Manager):
     def get_new_questions(self):
-        new_questions = self.get_queryset().all().order_by('-make_time').annotate(num_answer=Count('answer'),
-                                                                                  rating=Sum('likes__vote'))
+        new_questions = self.get_queryset().all().order_by('-make_time').\
+            annotate(num_answer=Count('answer'), rating=Sum('likes_question__vote', distinct=True))
         return new_questions
 
     def get_questions_by_tag(self, tag):
-        questions_by_tag = self.get_queryset().order_by('-make_time').filter(tags__id=tag).annotate(num_answer=Count('answer'),
-                                                                                                    rating=Sum('likes__vote'))
+        questions_by_tag = self.get_queryset().order_by('-make_time')\
+            .filter(tags__id=tag).annotate(num_answer=Count('answer'),
+                                           rating=Sum('likes_question__vote', distinct=True))
         return questions_by_tag
 
     def get_questions_by_rating(self):
-        questions_by_tag = self.get_queryset().annotate(num_answer=Count('answer'),
-                                                        rating=Sum('likes__vote')).order_by('-rating')
+        questions_by_tag = self.get_queryset().annotate(num_answer=Count('answer', distinct=True),
+                                                        rating=Sum('likes_question__vote', distinct=True))\
+                                                        .order_by('-rating')
         return questions_by_tag
 
     def get_question_by_id(self, question_id):
-        question_by_id = self.get_queryset().annotate(rating=Sum('likes__vote')).get(id=question_id)
+        question_by_id = self.get_queryset().annotate(rating=Sum('likes_question__vote'))\
+            .get(id=question_id)
         return question_by_id
+
 
 class LikeDislikeManager(models.Manager):
     use_for_related_fields = True
@@ -34,7 +38,7 @@ class LikeDislikeManager(models.Manager):
 
 
 class User(AbstractUser):
-     avatar = models.ImageField(upload_to='avatars', default='avatars/avatar.jpeg')
+    avatar = models.ImageField(upload_to='avatars', default='avatars/avatar.jpeg')
 
 
 class Tag(models.Model):
@@ -60,10 +64,10 @@ class Like(models.Model):
 class Question(models.Model):
     title = models.CharField(max_length=200, verbose_name=u"Заголовок вопроса")
     question_text = models.TextField(verbose_name=u"Текст вопроса")
-    make_time = models.DateTimeField(default=datetime.now, verbose_name=u"Время создания")
+    make_time = models.DateTimeField(auto_now_add=True, verbose_name=u"Время создания")
     author = models.ForeignKey(User, on_delete=models.CASCADE) #удалить объект, если удален объект автора
     tags = models.ManyToManyField(Tag, blank=True)
-    likes = GenericRelation(Like)
+    likes_question = GenericRelation(Like)
     #rating =
     objects = QuestionManager()
 
@@ -77,8 +81,7 @@ class Answer(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE) #удалить объект, если удален объект автора
     correct_mark = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    likes = GenericRelation(Like)
-    #rating =
+    likes_answer = GenericRelation(Like)
 
     def __str__(self):
         return f'Answer(pk={self.pk})'

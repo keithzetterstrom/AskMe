@@ -3,23 +3,23 @@
     list-style-type: none;
     padding-inline-start: 0px;
 }
-.cloud li,a {
+.cloud li {
     list-style: none;
     display: inline;
     padding-right: 10px;
 }
-.cloud li,a:nth-of-type(3n + 1) {
+.cloud li:nth-of-type(3n + 1) {
     font-size: 1.25em;
     color: #c70d0d;
 }
-.cloud li,a:nth-of-type(4n + 3) {
+.cloud li:nth-of-type(4n + 3) {
     font-size: 1.5em;
     color: #22a13b;
 }
-.cloud li,a:nth-of-type(5n - 3) {
+.cloud li:nth-of-type(5n - 3) {
     font-size: 1.75em;
     color: #fae900;
 }
-.cloud li,a:nth-of-type(6n - 4) {
+.cloud li:nth-of-type(6n - 4) {
     font-size: 1em;
 }
