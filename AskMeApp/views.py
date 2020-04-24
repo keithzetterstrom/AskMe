@@ -1,14 +1,17 @@
-from django.contrib.auth import authenticate, login
-from django.db.models import Count, Sum
-from django.shortcuts import render, get_object_or_404
-from django.http import HttpResponse, HttpResponseRedirect
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
+from django.db.models import Sum
+from django.shortcuts import render, get_object_or_404, redirect
+from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
-from .models import Question, Answer
+from django.urls import reverse
+
+from .models import Question
 from .forms import LoginForm
 
 
 def create_paginator(data, elements_in_page, page):
-    paginator = Paginator(data, elements_in_page)  # поста на каждой странице
+    paginator = Paginator(data, elements_in_page)
     try:
         posts = paginator.page(page)
     except PageNotAnInteger:
@@ -22,10 +25,6 @@ def create_paginator(data, elements_in_page, page):
 
 def index(request):
     return HttpResponse('hello')
-
-
-def authorisation(request):
-    return render(request, 'base.html', {'auth': 1})
 
 
 def sign_in(request):
@@ -48,63 +47,87 @@ def sign_in(request):
     return render(request, 'login.html', {'form': form})
 
 
+def sign_out(request):
+    logout(request)
+    next_page = request.GET.get('next', '/')
+    return HttpResponseRedirect(next_page)
+
+
 def sign_up(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('ask_me:questions'))
     return render(request, 'signup.html')
 
 
+@login_required
 def settings(request):
-    return render(request, 'settings.html')
+    context = {'auth': 1}
+    return render(request, 'settings.html', context)
 
 
+@login_required
 def ask(request):
-    return render(request, 'ask.html')
+    context = {'auth': 1}
+    return render(request, 'ask.html', context)
 
 
 def questions(request):
+    context = {'auth': 0}
+    if request.user.is_authenticated:
+        context['auth'] = 1
+
     questions_qs = Question.objects.get_new_questions()
 
     page = request.GET.get('page')
     posts = create_paginator(questions_qs, 20, page)
 
-    context = {'page': page,
-               'posts': posts,
-               'status': 1}
+    context.update({'page': page})
+    context.update({'posts': posts})
+    context.update({'status': 1})
     return render(request, 'questions.html', context)
 
 
 def question(request, question_id):
+    context = {'auth': 0}
+    if request.user.is_authenticated:
+        context['auth'] = 1
     question_obj = Question.objects.get_question_by_id(question_id)
-    answers_qs = question_obj.answer_set.all().annotate(rating=Sum('likes_answer__vote'))
+    answers_qs = question_obj.answer_set.all().order_by('-make_time').annotate(rating=Sum('likes_answer__vote'))
 
     page = request.GET.get('page')
     posts = create_paginator(answers_qs, 4, page)
-    print(question_obj.tags)
 
-    context = {'question': question_obj,
-               'answers': posts,
-               'page': page}
+    context.update({'question': question_obj})
+    context.update({'page': page})
+    context.update({'answers': posts})
     return render(request, 'question.html', context)
 
 
 def tag(request, tag_name):
+    context = {'auth': 0}
+    if request.user.is_authenticated:
+        context['auth'] = 1
     questions_qs = Question.objects.get_questions_by_tag(tag_name)
 
     page = request.GET.get('page')
     posts = create_paginator(questions_qs, 20, page)
 
-    context = {'page': page,
-               'posts': posts,
-               'status': 0}
+    context.update({'page': page})
+    context.update({'posts': posts})
+    context.update({'status': 1})
     return render(request, 'questions.html', context)
 
 
 def hot(request):
+    context = {'auth': 0}
+    if request.user.is_authenticated:
+        context['auth'] = 1
     questions_qs = Question.objects.get_questions_by_rating()
 
     page = request.GET.get('page')
     posts = create_paginator(questions_qs, 20, page)
 
-    context = {'page': page,
-               'posts': posts,
-               'status': 0}
+    context.update({'page': page})
+    context.update({'posts': posts})
+    context.update({'status': 0})
     return render(request, 'questions.html', context)

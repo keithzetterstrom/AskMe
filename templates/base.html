@@ -26,7 +26,7 @@
                     <div class="row">Vasya Pupkin</div>
                     <div class="row">
                         <a href="{% url 'ask_me:settings' %}">settings</a>
-                        <a class="ml-3" href="#home">log out</a>
+                        <a class="ml-3" href="{% url 'ask_me:logout' %}?next={{ request.path|urlencode }}">log out</a>
                     </div>
                 </div>
             </div>

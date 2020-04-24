@@ -17,3 +17,16 @@ class RegisterForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
     email = forms.EmailField(widget=forms.EmailInput)
+    avatar = forms.ImageField()
+
+
+class QuestionForm(forms.Form):
+    title = forms.CharField()
+    question_text = forms.CharField(widget=forms.TextInput)
+
+
+class SettingsForm(forms.Form):
+    username = forms.CharField()
+    password = forms.CharField(widget=forms.PasswordInput)
+    email = forms.EmailField(widget=forms.EmailInput)
+    avatar = forms.ImageField()

@@ -42,12 +42,13 @@
             {% include 'inc/pagination.html' with page=answers %}
         {% endif %}
     </div>
-
-    <div class="col-8 my-4 mx-auto">
-        <form action="">
-            <p><textarea class="form-control" rows="5" placeholder="Enter your answer here..."></textarea></p>
-            <p><input class="btn btn-secondary" type="submit" value="Answer"></p>
-        </form>
-    </div>
+    {% if auth %}
+        <div class="col-8 my-4 mx-auto">
+            <form action="">
+                <p><textarea class="form-control" rows="5" placeholder="Enter your answer here..."></textarea></p>
+                <p><input class="btn btn-secondary" type="submit" value="Answer"></p>
+            </form>
+        </div>
+    {% endif %}
 
 {% endblock %}
