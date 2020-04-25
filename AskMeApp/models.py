@@ -29,6 +29,11 @@ class QuestionManager(models.Manager):
             .get(id=question_id)
         return question_by_id
 
+    def get_new_answers(self, question_obj):
+        new_answers = question_obj.answer_set.all().order_by('-make_time').\
+            annotate(rating=Sum('likes_answer__vote'))
+        return new_answers
+
 
 class LikeDislikeManager(models.Manager):
     use_for_related_fields = True

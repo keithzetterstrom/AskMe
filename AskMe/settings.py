@@ -138,3 +138,6 @@ MEDIA_URL = '/uploads/'
 AUTH_USER_MODEL = 'AskMeApp.User'
 
 LOGIN_URL = '/AskMe/login/'
+
+enable_urls = (r'login/', r'signup/', r'settings/', r'ask/', r'', r'question/(\d+)/',
+               r'tag/([^/]+)/', r'hot/', r'logout/')

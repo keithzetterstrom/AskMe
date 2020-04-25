@@ -1,13 +1,13 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.db.models import Sum
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
-
+from re import findall, match, fullmatch
+from AskMe.settings import enable_urls
 from .models import Question
-from .forms import LoginForm
+from .forms import LoginForm, QuestionForm
 
 
 def create_paginator(data, elements_in_page, page):
@@ -21,6 +21,14 @@ def create_paginator(data, elements_in_page, page):
         # Если страница больше максимальной, доставить последнюю страницу результатов
         posts = paginator.page(paginator.num_pages)
     return posts
+
+
+def is_enable_url(some_url):
+    for url in enable_urls:
+        enable_url = r'/AskMe/' + url
+        if fullmatch(enable_url, some_url):
+            return True
+    return False
 
 
 def index(request):
@@ -37,7 +45,10 @@ def sign_in(request):
                 if user.is_active:
                     login(request, user)
                     next_page = request.POST.get('next', '/')
-                    return HttpResponseRedirect(next_page)
+                    if is_enable_url(next_page):
+                        return HttpResponseRedirect(next_page)
+                    else:
+                        return HttpResponse('helo')
                 else:
                     return HttpResponse('Disabled account')
             else:
@@ -68,6 +79,14 @@ def settings(request):
 @login_required
 def ask(request):
     context = {'auth': 1}
+    if request.method == 'POST':
+        form = QuestionForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            return HttpResponse('Invalid login')
+    else:
+        form = QuestionForm()
+        context.update({'form': form})
     return render(request, 'ask.html', context)
 
 
@@ -92,7 +111,7 @@ def question(request, question_id):
     if request.user.is_authenticated:
         context['auth'] = 1
     question_obj = Question.objects.get_question_by_id(question_id)
-    answers_qs = question_obj.answer_set.all().order_by('-make_time').annotate(rating=Sum('likes_answer__vote'))
+    answers_qs = Question.objects.get_new_answers(question_obj)
 
     page = request.GET.get('page')
     posts = create_paginator(answers_qs, 4, page)
