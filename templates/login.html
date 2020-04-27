@@ -1,5 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
+{# Load the tag library #}
+{% load bootstrap4 %}
+
+{# Load CSS and JavaScript #}
+{% bootstrap_css %}
+{% bootstrap_javascript jquery='full' %}
 
 {% block content %}
     <div class="col-8 mx-auto">
@@ -7,10 +13,20 @@
 
         <form name="login" action="" method="post">
             {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <ul class='form-errors'>
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             <div class="form-group row">
                 <label for="login" class="col-md-4 col-form-label text-md-left">Login</label>
                 <div class="col-md-8">
                     {{ form.username }}
+                    {{ form.username.errors }}
                 </div>
             </div>
 

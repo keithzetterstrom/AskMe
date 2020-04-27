@@ -37,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'AskMeApp'
+    'bootstrap4',
+    'AskMeApp',
 ]
 
 MIDDLEWARE = [
@@ -141,3 +142,7 @@ LOGIN_URL = '/AskMe/login/'
 
 enable_urls = (r'login/', r'signup/', r'settings/', r'ask/', r'', r'question/(\d+)/',
                r'tag/([^/]+)/', r'hot/', r'logout/')
+
+AUTHENTICATION_BACKENDS = (
+        'django.contrib.auth.backends.ModelBackend',
+    )

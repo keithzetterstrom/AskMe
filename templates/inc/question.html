@@ -4,7 +4,11 @@
         <div class="col-auto mt-3">
             <img src="{{question.author.avatar.url}}" class="img-fluid rounded" alt="...">
             <p class="text-center font-weight-bold mt-4 mb-1">
-                {{ question.rating }}
+                {% if question.rating %}
+                    {{question.rating}}
+                {% else %}
+                    0
+                {% endif %}
             </p>
             <div class="row mx-auto">
                 <a href=""><img src="{% static 'img/like.png' %}" class="mx-1"></a>
@@ -16,7 +20,7 @@
             <div>
                 <h5 class="mt-0" style="text-decoration: underline;"><a href="{% url 'ask_me:question' question.id %}"  class="text-dark"> {{question.title}} </a></h5>
                 <p class="text-secondary">by {{question.author.username}}</p>
-                <p class="clip" style="height: 50px; overflow: hidden; text-overflow: ellipsis;">{{question.question_text}} </p>
+                <p class="clip text-break" style="height: 50px; overflow: hidden; text-overflow: ellipsis;">{{question.question_text}} </p>
             </div>
             <div>
                 <a href="{% url 'ask_me:question' question.id %}" class="text-secondary mr-5">answer ({{ question.num_answer }})</a>

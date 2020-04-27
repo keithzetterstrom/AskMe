@@ -1,13 +1,14 @@
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponse, HttpResponseRedirect, Http404
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseRedirect
+from django.utils.http import urlencode
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
-from re import findall, match, fullmatch
+from re import fullmatch
 from AskMe.settings import enable_urls
 from .models import Question
-from .forms import LoginForm, QuestionForm
+from .forms import LoginForm, QuestionForm, AnswerForm, SettingsForm, RegisterForm
 
 
 def create_paginator(data, elements_in_page, page):
@@ -36,6 +37,8 @@ def index(request):
 
 
 def sign_in(request):
+    if request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('ask_me:questions'))
     if request.method == 'POST':
         form = LoginForm(request.POST)
         if form.is_valid():
@@ -48,11 +51,9 @@ def sign_in(request):
                     if is_enable_url(next_page):
                         return HttpResponseRedirect(next_page)
                     else:
-                        return HttpResponse('helo')
+                        return HttpResponse('Bad page')
                 else:
                     return HttpResponse('Disabled account')
-            else:
-                return HttpResponse('Invalid login')
     else:
         form = LoginForm()
     return render(request, 'login.html', {'form': form})
@@ -67,33 +68,55 @@ def sign_out(request):
 def sign_up(request):
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('ask_me:questions'))
-    return render(request, 'signup.html')
+    if request.method == 'POST':
+        form = RegisterForm(request.POST, request.FILES)
+        if form.is_valid():
+            cd = form.cleaned_data
+            user = form.save()
+            user_au = authenticate(username=cd['username'], password=cd['password'])
+            login(request, user_au)
+            return HttpResponseRedirect(reverse('ask_me:questions'))
+    else:
+        form = RegisterForm()
+    context = {'form': form}
+    return render(request, 'signup.html', context)
 
 
 @login_required
 def settings(request):
-    context = {'auth': 1}
+    context = {}
+    if request.method == 'POST':
+        form = SettingsForm(request.POST, request.FILES, instance=request.user)
+        if form.is_valid():
+            cd = form.cleaned_data
+            form.save()
+            return HttpResponseRedirect(reverse('ask_me:questions'))
+    else:
+        form = SettingsForm(instance=request.user)
+    context.update({'form': form})
     return render(request, 'settings.html', context)
 
 
 @login_required
 def ask(request):
-    context = {'auth': 1}
+    context = {}
     if request.method == 'POST':
         form = QuestionForm(request.POST)
         if form.is_valid():
             cd = form.cleaned_data
-            return HttpResponse('Invalid login')
+            post = form.save(commit=False)
+            post.author = request.user
+            post.save()
+            form.save_m2m()
+            return redirect('ask_me:question', question_id=post.id)
     else:
         form = QuestionForm()
-        context.update({'form': form})
+    context.update({'form': form})
     return render(request, 'ask.html', context)
 
 
 def questions(request):
-    context = {'auth': 0}
-    if request.user.is_authenticated:
-        context['auth'] = 1
+    context = {}
 
     questions_qs = Question.objects.get_new_questions()
 
@@ -107,14 +130,31 @@ def questions(request):
 
 
 def question(request, question_id):
-    context = {'auth': 0}
-    if request.user.is_authenticated:
-        context['auth'] = 1
+    context = {}
+
     question_obj = Question.objects.get_question_by_id(question_id)
     answers_qs = Question.objects.get_new_answers(question_obj)
 
     page = request.GET.get('page')
     posts = create_paginator(answers_qs, 4, page)
+
+    if request.user.is_authenticated:
+        context.update({'user': request.user})
+        if request.method == 'POST':
+            form = AnswerForm(request.POST)
+            if form.is_valid():
+                cd = form.cleaned_data
+                post = form.save(commit=False)
+                post.author = request.user
+                post.question = question_obj
+                post.save()
+                # как это сделать лучше?
+                get_args_str = urlencode({'page': 1})
+                url = '/AskMe/question/' + str(question_obj.id) + '/?' + get_args_str
+                return HttpResponseRedirect(url)
+        else:
+            form = AnswerForm()
+        context.update({'form': form})
 
     context.update({'question': question_obj})
     context.update({'page': page})
@@ -123,9 +163,8 @@ def question(request, question_id):
 
 
 def tag(request, tag_name):
-    context = {'auth': 0}
-    if request.user.is_authenticated:
-        context['auth'] = 1
+    context = {}
+
     questions_qs = Question.objects.get_questions_by_tag(tag_name)
 
     page = request.GET.get('page')
@@ -138,9 +177,7 @@ def tag(request, tag_name):
 
 
 def hot(request):
-    context = {'auth': 0}
-    if request.user.is_authenticated:
-        context['auth'] = 1
+    context = {}
     questions_qs = Question.objects.get_questions_by_rating()
 
     page = request.GET.get('page')

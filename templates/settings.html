@@ -5,35 +5,50 @@
     <div class="col-8 mx-auto">
         <h4 class="text-md-left my-4" style=";">Settings:</h4>
 
-        <form name="my-form" onsubmit="return validform()" action="" method="post">
+        <form name="my-form" enctype="multipart/form-data" action="" method="post">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <ul class='form-errors'>
+                    {% for error in form.non_field_errors %}
+                        <p>{{ error }}</p>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
             <div class="form-group row">
                 <label for="login" class="col-md-4 col-form-label text-md-left">Login</label>
+                {{ form.username.errors }}
                 <div class="col-md-6">
-                    <input type="text" id="login" class="form-control" name="login">
+                    {% comment %}<input type="text" id="login" class="form-control" name="login">{% endcomment %}
+                    {{ form.username }}
                 </div>
             </div>
 
             <div class="form-group row">
                 <label for="email_address" class="col-md-4 col-form-label text-md-left">E-Mail Address</label>
+                {{ form.email.errors }}
                 <div class="col-md-6">
-                    <input type="email" id="email_address" class="form-control" name="email-address">
+{#                    <input type="email" id="email_address" class="form-control" name="email-address">#}
+                    {{ form.email }}
                 </div>
             </div>
 
-            <div class="form-group row">
+            {% comment %}<div class="form-group row">
                 <label for="nick_name" class="col-md-4 col-form-label text-md-left">NickName</label>
                 <div class="col-md-6">
                     <input type="text" id="nick_name" class="form-control" name="nick_name">
                 </div>
-            </div>
+            </div>{% endcomment %}
 
             <div class="form-group row">
                 <label for="upload_avatar" class="col-md-4 col-form-label text-md-left">Upload avatar</label>
                 <div class="col-md-6">
-                    <img src="{% static 'img/2.jpeg' %}" id="upload_avatar" alt="photo">
+                    <img src="{{ user.avatar.url }}" id="upload_avatar" alt="photo">
 
                     <div class="my-3">
-                        <input type="file" id="upload_avatar" multiple accept="image/*,image/jpeg" name="upload_avatar">
+                        {{ form.avatar }}
+{#                        <input type="file" id="upload_avatar" multiple accept="image/*,image/jpeg" name="upload_avatar">#}
                     </div>
                 </div>
             </div>

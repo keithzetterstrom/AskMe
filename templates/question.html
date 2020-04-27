@@ -8,7 +8,11 @@
         <div class="col-auto">
             <img src="{{question.author.avatar.url}}" class="img-fluid rounded" alt="..." >
             <p class="text-center font-weight-bold mt-4 mb-1">
-                {{ question.rating }}
+                {% if question.rating %}
+                    {{question.rating}}
+                {% else %}
+                    0
+                {% endif %}
             </p>
             <div class="row mx-auto">
                 <a href=""><img src="{% static 'img/like.png' %}" class="mx-1"></a>
@@ -19,7 +23,7 @@
             <div class="text-left">
                 <h5 class="mt-0">{{ question.title }}</h5>
                 <p class="text-secondary">{{question.author.username}}</p>
-                <p class="clip" style=" word-wrap: break-word; height: auto; width: auto; text-overflow: ellipsis;">{{ question.question_text }}</p>
+                <p class="clip text-break" style=" word-wrap: break-word; height: auto; width: auto; text-overflow: ellipsis;">{{ question.question_text }}</p>
             </div>
             <div class="mb-3">
                 Tags:
@@ -42,10 +46,12 @@
             {% include 'inc/pagination.html' with page=answers %}
         {% endif %}
     </div>
-    {% if auth %}
+    {% if user.is_authenticated %}
         <div class="col-8 my-4 mx-auto">
-            <form action="">
-                <p><textarea class="form-control" rows="5" placeholder="Enter your answer here..."></textarea></p>
+            <form action="" method="post">
+                {% csrf_token %}
+                {% comment %}<p><textarea class="form-control" rows="5" placeholder="Enter your answer here..."></textarea></p>{% endcomment %}
+                <p>{{ form.answer_text }}</p>
                 <p><input class="btn btn-secondary" type="submit" value="Answer"></p>
             </form>
         </div>
