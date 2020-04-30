@@ -9,7 +9,7 @@ class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
 
-    # def clean_username(self):
+    # def clean_username(self):s
     #     username = self.cleaned_data['username']
     #     if ' ' in username:
     #         #self.add_error('username', 'username contanes probel')

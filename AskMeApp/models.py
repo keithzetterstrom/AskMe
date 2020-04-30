@@ -8,7 +8,7 @@ from django.db.models import Count, Sum
 class QuestionManager(models.Manager):
     def get_new_questions(self):
         new_questions = self.get_queryset().all().order_by('-make_time'). \
-            annotate(num_answer=Count('answer'), rating=Sum('likes_question__vote', distinct=True))
+            annotate(num_answer=Count('answer'), rating=Sum('likes_question__vote'))
         return new_questions
 
     def get_questions_by_tag(self, tag):
