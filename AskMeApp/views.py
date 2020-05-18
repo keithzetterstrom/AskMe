@@ -1,13 +1,19 @@
+import json
+
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
+from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.http import urlencode
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
 from re import fullmatch
+
+from django.views import View
+
 from AskMe.settings import enable_urls
-from .models import Question
+from .models import Question, Like
 from .forms import LoginForm, QuestionForm, AnswerForm, SettingsForm, RegisterForm
 
 
@@ -133,6 +139,7 @@ def question(request, question_id):
     context = {}
 
     question_obj = Question.objects.get_question_by_id(question_id)
+    print(question_obj.rating)
     answers_qs = Question.objects.get_new_answers(question_obj)
 
     page = request.GET.get('page')
@@ -187,3 +194,44 @@ def hot(request):
     context.update({'posts': posts})
     context.update({'status': 0})
     return render(request, 'questions.html', context)
+
+
+class VotesView(View):
+    model = None  # Модель вопроса или ответа
+    vote_type = None  # Лайк или дизлайк
+
+    def post(self, request, pk):
+        obj = self.model.objects.get(pk=pk)
+        try:
+            like_dislike = Like.objects.get(content_type=ContentType.objects.get_for_model(obj),
+                                            object_id=obj.id,
+                                            user=request.user)
+
+            # если оценка пользователя на этот объект отличается от поставленной ранее
+            # меняем оценку и рейтинг
+            if like_dislike.vote is not self.vote_type:
+                like_dislike.vote = self.vote_type
+                obj.rating += 2 * self.vote_type
+                like_dislike.save(update_fields=['vote'])
+                result = True
+            # если совпадает - отменяем предыдущую оценку,
+            # обновляем рейтинг, удаляем модель лайка
+            else:
+                obj.rating -= self.vote_type
+                like_dislike.delete()
+                result = False
+        # если ранне оценок не было создаем модель лайка и обновляем рейтинг
+        except Like.DoesNotExist:
+            obj.likes.create(user=request.user, vote=self.vote_type)
+            obj.rating += self.vote_type
+            result = True
+
+        obj.save()
+        return HttpResponse(
+            json.dumps({
+                "result": result,
+                "like_count": obj.likes.likes().count(),
+                "dislike_count": obj.likes.dislikes().count(),
+            }),
+            content_type="application/json"
+        )

@@ -34,7 +34,7 @@ class RegisterForm(ModelForm):
         widgets = {
             'password': forms.PasswordInput(),
             'email': forms.EmailInput(),
-            'avatar': forms.FileInput()
+            'avatar': forms.ClearableFileInput()
         }
 
     def clean(self):

@@ -7,35 +7,40 @@ from django.db.models import Count, Sum
 
 class QuestionManager(models.Manager):
     def get_new_questions(self):
+        # new_questions = self.get_queryset().all().order_by('-make_time'). \
+        #     annotate(num_answer=Count('answer'), rating=Sum('likes_question__vote'))
         new_questions = self.get_queryset().all().order_by('-make_time'). \
-            annotate(num_answer=Count('answer'), rating=Sum('likes_question__vote'))
+            annotate(num_answer=Count('answer'))
         return new_questions
 
     def get_questions_by_tag(self, tag):
         questions_by_tag = self.get_queryset().order_by('-make_time') \
-            .filter(tags__tag_name=tag).annotate(num_answer=Count('answer'),
-                                                 rating=Sum('likes_question__vote', distinct=True))
+            .filter(tags__tag_name=tag).annotate(num_answer=Count('answer'))
         return questions_by_tag
 
     def get_questions_by_rating(self):
-        questions_by_tag = self.get_queryset().annotate(num_answer=Count('answer', distinct=True),
-                                                        rating=Sum('likes_question__vote', distinct=True)) \
-            .order_by('-rating')
+        questions_by_tag = self.get_queryset().order_by('-rating').annotate(num_answer=Count('answer', distinct=True))
         return questions_by_tag
 
     def get_question_by_id(self, question_id):
-        question_by_id = self.get_queryset().annotate(rating=Sum('likes_question__vote')) \
-            .get(id=question_id)
+        question_by_id = self.get_queryset().get(id=question_id)
         return question_by_id
 
     def get_new_answers(self, question_obj):
-        new_answers = question_obj.answer_set.all().order_by('-make_time'). \
-            annotate(rating=Sum('likes_answer__vote'))
+        new_answers = question_obj.answer_set.all().order_by('-make_time')
         return new_answers
 
 
 class LikeDislikeManager(models.Manager):
     use_for_related_fields = True
+
+    def likes(self):
+        # We take the queryset with records greater than 0
+        return self.get_queryset().filter(vote__gt=0)
+
+    def dislikes(self):
+        # We take the queryset with records less than 0
+        return self.get_queryset().filter(vote__lt=0)
 
     def sum_rating(self):
         return self.get_queryset().aggregate(Sum('vote')).get('vote__sum') or 0
@@ -72,8 +77,9 @@ class Question(models.Model):
     make_time = models.DateTimeField(auto_now_add=True, verbose_name=u"Время создания")
     author = models.ForeignKey(User, on_delete=models.CASCADE)  # удалить объект, если удален объект автора
     tags = models.ManyToManyField(Tag, blank=True)
-    likes_question = GenericRelation(Like)
-    # rating =
+    likes = GenericRelation(Like)
+    rating = models.IntegerField(default=0, null=False, verbose_name='Рейтинг')
+    answers_count = models.IntegerField(default=0, null=False, verbose_name='Количество ответов')
     objects = QuestionManager()
 
     def __str__(self):
@@ -86,7 +92,8 @@ class Answer(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)  # удалить объект, если удален объект автора
     correct_mark = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
-    likes_answer = GenericRelation(Like)
+    likes = GenericRelation(Like)
+    rating = models.IntegerField(default=0, null=False, verbose_name='Рейтинг')
 
     def __str__(self):
         return f'Answer(pk={self.pk})'

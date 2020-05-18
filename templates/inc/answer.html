@@ -4,17 +4,37 @@
     <div class="row mx-2 my-2">
         <div class="col-auto">
             <img src="{{answer.author.avatar.url}}" class="img-fluid rounded" alt="..." >
-            <p class="text-center font-weight-bold mt-3 mb-1">
-                {% if answer.rating %}
-                    {{answer.rating}}
-                {% else %}
-                    0
-                {% endif %}
-            </p>
-            <div class="row mx-auto">
-                <a href=""><img src="{% static 'img/like.png' %}" class="mx-1"></a>
-                <a href=""><img src="{% static 'img/dislike.png' %}" class="mx-1"></a>
-            </div>
+
+            {% if user.is_authenticated %}
+                <div class="row mt-3">
+                    <div class="likes">
+                        <button type="button" class="btn btn-sm" data-id="{{ answer.id }}" data-type="answer" data-action="like" title="Like">
+                            <img src="{% static 'img/like.png' %}" width="17px">
+                            <span data-count="like">{{ answer.likes.likes.count }}</span>
+                        </button>
+
+                        <button type="button" class="btn btn-sm" data-id="{{ answer.id }}" data-type="answer" data-action="dislike" title="Dislike">
+                            <img src="{% static 'img/dislike.png' %}" width="17px">
+                            <span data-count="dislike">{{ answer.likes.dislikes.count }}</span>
+                        </button>
+                    </div>
+                </div>
+            {% else %}
+                <div class="row mt-3">
+                    <div class="likes">
+                        <button disabled type="button" class="btn btn-sm">
+                            <img src="{% static 'img/like.png' %}" width="17px">
+                            <span data-count="like">{{ answer.likes.likes.count }}</span>
+                        </button>
+
+                        <button disabled type="button" class="btn btn-sm" >
+                            <img src="{% static 'img/dislike.png' %}" width="17px">
+                            <span data-count="dislike">{{ answer.likes.dislikes.count }}</span>
+                        </button>
+                    </div>
+                </div>
+            {% endif %}
+
         </div>
         <div class="col-auto media-body">
             <div>
