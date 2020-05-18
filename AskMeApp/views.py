@@ -155,6 +155,8 @@ def question(request, question_id):
                 post.author = request.user
                 post.question = question_obj
                 post.save()
+                question_obj.answers_count += 1
+                question_obj.save()
                 # как это сделать лучше?
                 get_args_str = urlencode({'page': 1})
                 url = '/AskMe/question/' + str(question_obj.id) + '/?' + get_args_str

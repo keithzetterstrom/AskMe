@@ -42,7 +42,7 @@
                 <p class="clip text-break" style="height: 50px; overflow: hidden; text-overflow: ellipsis;">{{question.question_text}} </p>
             </div>
             <div>
-                <a href="{% url 'ask_me:question' question.id %}" class="text-secondary mr-5">answer ({{ question.num_answer }})</a>
+                <a href="{% url 'ask_me:question' question.id %}" class="text-secondary mr-5">answer ({{ question.answers_count }})</a>
                 Tags:
                 <span class="mr-2"></span>
                 {% for tag in question.tags.all %}

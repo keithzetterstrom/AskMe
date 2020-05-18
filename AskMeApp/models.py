@@ -9,17 +9,16 @@ class QuestionManager(models.Manager):
     def get_new_questions(self):
         # new_questions = self.get_queryset().all().order_by('-make_time'). \
         #     annotate(num_answer=Count('answer'), rating=Sum('likes_question__vote'))
-        new_questions = self.get_queryset().all().order_by('-make_time'). \
-            annotate(num_answer=Count('answer'))
+        new_questions = self.get_queryset().all().order_by('-make_time')
         return new_questions
 
     def get_questions_by_tag(self, tag):
         questions_by_tag = self.get_queryset().order_by('-make_time') \
-            .filter(tags__tag_name=tag).annotate(num_answer=Count('answer'))
+            .filter(tags__tag_name=tag)
         return questions_by_tag
 
     def get_questions_by_rating(self):
-        questions_by_tag = self.get_queryset().order_by('-rating').annotate(num_answer=Count('answer', distinct=True))
+        questions_by_tag = self.get_queryset().order_by('-rating')
         return questions_by_tag
 
     def get_question_by_id(self, question_id):
