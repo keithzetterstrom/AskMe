@@ -41,6 +41,21 @@ function dislike() {
 }
 
 
+function correct(pk) {
+    $.ajax({
+        url : "/AskMe/js/answer/" + pk + "/correct/",
+        type : 'POST',
+        data : { 'obj' : pk },
+        success : function (json) {
+            if (json.prev_answer_id !== -1) {
+                document.getElementById(json.prev_answer_id).checked = false;
+            }
+        }
+    });
+    return false;
+}
+
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie !== '') {

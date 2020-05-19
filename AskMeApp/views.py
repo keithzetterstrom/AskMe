@@ -9,12 +9,11 @@ from django.utils.http import urlencode
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
 from re import fullmatch
-
 from django.views import View
-
 from AskMe.settings import enable_urls
-from .models import Question, Like
+from .models import Question, Like, Answer
 from .forms import LoginForm, QuestionForm, AnswerForm, SettingsForm, RegisterForm
+#from cursor_pagination import CursorPaginator
 
 
 def create_paginator(data, elements_in_page, page):
@@ -28,6 +27,40 @@ def create_paginator(data, elements_in_page, page):
         # Если страница больше максимальной, доставить последнюю страницу результатов
         posts = paginator.page(paginator.num_pages)
     return posts
+
+
+# def posts_api(request, data, after=None):
+#     page_size = 20
+#     paginator = CursorPaginator(data, ordering=('-created', '-id'))
+#     page = paginator.page(first=page_size, after=after)
+#     context = {
+#         'objects': [serialize_page(p) for p in page],
+#         'has_next_page': page.has_next,
+#         'last_cursor': paginator.cursor(page[-1])
+#     }
+#     return data
+
+
+# def chunked_queryset_iterator(queryset, size, *, ordering=('id',)):
+#     """Split a queryset into chunks.
+#     This can be used instead of ``queryset.iterator()``,
+#     so ``.prefetch_related()`` also works.
+#     .. note::
+#         The ordering must uniquely identify the object,
+#         and be in the same order (ASC/DESC).
+#     """
+#     pager = CursorPaginator(queryset, ordering)
+#     after = None
+#     while True:
+#         page = pager.page(after=after, first=size)
+#         if page:
+#             yield from page.items
+#         else:
+#             return
+#         if not page.has_next:
+#             break
+#         # take last item, next page starts after this.
+#         after = pager.cursor(instance=page[-1])
 
 
 def is_enable_url(some_url):
@@ -196,6 +229,28 @@ def hot(request):
     context.update({'posts': posts})
     context.update({'status': 0})
     return render(request, 'questions.html', context)
+
+
+def correct_answer(request, pk):
+    answer_obj = Answer.objects.get(pk=pk)
+    prev_answer_id = -1
+    if not answer_obj.correct_mark:
+        answer = Answer.objects.get_correct_answer(answer_obj.question.id)
+        if answer:
+            answer[0].correct_mark = False
+            answer[0].save()
+            prev_answer_id = answer[0].id
+        answer_obj.correct_mark = True
+    else:
+        answer_obj.correct_mark = False
+
+    answer_obj.save()
+    return HttpResponse(
+            json.dumps({
+                "prev_answer_id": prev_answer_id,
+            }),
+            content_type="application/json"
+        )
 
 
 class VotesView(View):

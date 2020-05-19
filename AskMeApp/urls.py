@@ -25,4 +25,6 @@ urlpatterns = [
         name='answer_like'),
     url(r'^js/answer/(?P<pk>\d+)/dislike/$',
         login_required(VotesView.as_view(model=Answer, vote_type=Like.DISLIKE)), name='answer_dislike'),
+    url(r'^js/answer/(?P<pk>\d+)/correct/$',
+        login_required(views.correct_answer), name='answer_correct'),
 ]

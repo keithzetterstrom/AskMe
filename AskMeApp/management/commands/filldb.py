@@ -41,8 +41,11 @@ class Command(BaseCommand):
             )
             q.save()
 
-            for i in range(randint(0, 6)):
-                q.likes_question.create(user=User(author_ids[i]), vote=choice(vote))
+            for i in range(randint(0, 40)):
+                v = choice(vote)
+                q.likes.create(user=User(author_ids[i]), vote=v)
+                q.rating += v
+                q.save()
 
             for i in range(randint(0, 6)):
                 tag = choice(tag_ids)
@@ -55,14 +58,21 @@ class Command(BaseCommand):
         vote = (1, -1)
 
         for i in range(cnt):
+            #questions_obj = Question(choice(questions_ids))
+            questions_obj = Question.objects.get(pk=choice(questions_ids))
             a = Answer(
                 author=User(choice(author_ids)),
                 answer_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
-                question=Question(choice(questions_ids)),
+                question=questions_obj,
             )
             a.save()
-            for i in range(randint(0, 6)):
-                a.likes_answer.create(user=User(author_ids[i]), vote=choice(vote))
+            questions_obj.answers_count += 1
+            questions_obj.save()
+            for i in range(randint(0, 40)):
+                v = choice(vote)
+                a.likes.create(user=User(author_ids[i]), vote=v)
+                a.rating += v
+                a.save()
 
     def fill_likes(self):
         author_ids = list(User.objects.values_list('id', flat=True))
@@ -111,9 +121,9 @@ class Command(BaseCommand):
 
     def fill_db(self):
         self.fill_tags()
-        self.fill_authors(10)
-        self.fill_questions(40)
-        #self.fill_answers(80)
+        self.fill_authors(10000)
+        self.fill_questions(100000)
+        self.fill_answers(1000000)
         #self.fill_likes()
 
     def handle(self, *args, **options):

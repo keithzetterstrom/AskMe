@@ -30,6 +30,15 @@ class QuestionManager(models.Manager):
         return new_answers
 
 
+class AnswerManager(models.Manager):
+    def get_answers_by_question_id(self, question_id):
+        answers = self.get_queryset().filter(question=Question(question_id))
+        return answers
+
+    def get_correct_answer(self, question_id):
+        answer = self.get_queryset().filter(question=Question(question_id), correct_mark=True)
+        return answer
+
 class LikeDislikeManager(models.Manager):
     use_for_related_fields = True
 
@@ -93,6 +102,7 @@ class Answer(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     likes = GenericRelation(Like)
     rating = models.IntegerField(default=0, null=False, verbose_name='Рейтинг')
+    objects = AnswerManager()
 
     def __str__(self):
         return f'Answer(pk={self.pk})'

@@ -45,8 +45,23 @@
                     {{ answer.answer_text }}
                 </p>
             </div>
+            {% if user.id == answer.author.id %}
+                <div class="Correct">
+                    {% if answer.correct_mark %}
+                        <input type="checkbox" checked id="{{ answer.id }}" onclick="correct({{ answer.id }})" title="Correct"> Correct!
+                    {% else %}
+                        <input type="checkbox" id="{{ answer.id }}" onclick="correct({{ answer.id }})" title="Correct"> Correct!
+                        {% comment %}<input type="checkbox" data-id="{{ answer.id }}" data-type="answer" data-action="correct" title="Correct"> Correct!{% endcomment %}
+                    {%  endif %}
+                </div>
+            {% else %}
+                <div>
+                {% if answer.correct_mark %}
+                    <div class="text-success">Correct!</div>
+                {% endif %}
+                </div>
+            {% endif %}
             <div>
-                <input type="checkbox"> Correct!
                 <p class="text-right text-secondary m-0">{{ answer.make_time }}</p>
             </div>
         </div>
