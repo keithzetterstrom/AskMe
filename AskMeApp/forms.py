@@ -55,6 +55,7 @@ class QuestionForm(ModelForm):
         fields = ['title', 'question_text', 'tags']
         widgets = {
             'question_text': forms.Textarea(),
+            'tags': forms.CheckboxSelectMultiple(),
         }
 
 

@@ -65,7 +65,7 @@ class Tag(models.Model):
     tag_name = models.CharField(max_length=70, verbose_name=u"Название тэга")
 
     def __str__(self):
-        return f'Tag(pk={self.pk}):{self.tag_name}'
+        return f'{self.tag_name}'
 
 
 class Like(models.Model):
