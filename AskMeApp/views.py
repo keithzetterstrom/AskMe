@@ -16,7 +16,27 @@ from .forms import LoginForm, QuestionForm, AnswerForm, SettingsForm, RegisterFo
 #from cursor_pagination import CursorPaginator
 
 
+def paginate_large_data(qs, page, elements_in_page):
+    if not page:
+        page = 1
+    qs_len = qs.count()
+    print(qs_len)
+    if qs_len % elements_in_page:
+        page_count = int(qs_len / elements_in_page) + 1
+    else:
+        page_count = int(qs_len / elements_in_page)
+    if int(page) > page_count:
+        left = (page_count - 1) * elements_in_page
+        right = qs_len
+    else:
+        left = (int(page) - 1) * elements_in_page
+        right = int(page) * elements_in_page
+    return qs[left:right]
+
+
 def create_paginator(data, elements_in_page, page):
+    #data = paginate_large_data(qs, page, elements_in_page)
+    print(data.count())
     paginator = Paginator(data, elements_in_page)
     try:
         posts = paginator.page(page)
@@ -165,6 +185,7 @@ def questions(request):
     context.update({'page': page})
     context.update({'posts': posts})
     context.update({'status': 1})
+    print('finish')
     return render(request, 'questions.html', context)
 
 
@@ -172,7 +193,6 @@ def question(request, question_id):
     context = {}
 
     question_obj = Question.objects.get_question_by_id(question_id)
-    print(question_obj.rating)
     answers_qs = Question.objects.get_new_answers(question_obj)
 
     page = request.GET.get('page')
@@ -268,27 +288,41 @@ class VotesView(View):
             # меняем оценку и рейтинг
             if like_dislike.vote is not self.vote_type:
                 like_dislike.vote = self.vote_type
-                obj.rating += 2 * self.vote_type
+                #obj.rating += 2 * self.vote_type
                 like_dislike.save(update_fields=['vote'])
+                if self.vote_type > 0:
+                    obj.likes_count += 1
+                    obj.dislikes_count -= 1
+                else:
+                    obj.likes_count -= 1
+                    obj.dislikes_count += 1
                 result = True
             # если совпадает - отменяем предыдущую оценку,
             # обновляем рейтинг, удаляем модель лайка
             else:
-                obj.rating -= self.vote_type
+                #obj.rating -= self.vote_type
                 like_dislike.delete()
+                if self.vote_type > 0:
+                    obj.likes_count -= 1
+                else:
+                    obj.dislikes_count -= 1
                 result = False
         # если ранне оценок не было создаем модель лайка и обновляем рейтинг
         except Like.DoesNotExist:
             obj.likes.create(user=request.user, vote=self.vote_type)
-            obj.rating += self.vote_type
+            #obj.rating += self.vote_type
+            if self.vote_type > 0:
+                obj.likes_count += 1
+            else:
+                obj.dislikes_count += 1
             result = True
 
         obj.save()
         return HttpResponse(
             json.dumps({
                 "result": result,
-                "like_count": obj.likes.likes().count(),
-                "dislike_count": obj.likes.dislikes().count(),
+                "like_count": obj.likes_count,
+                "dislike_count": obj.dislikes_count,
             }),
             content_type="application/json"
         )

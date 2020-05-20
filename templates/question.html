@@ -12,12 +12,12 @@
                     <div class="likes">
                         <button type="button" class="btn btn-sm" data-id="{{ question.id }}" data-type="question" data-action="like" title="Like">
                             <img src="{% static 'img/like.png' %}" width="17px">
-                            <span data-count="like">{{ question.likes.likes.count }}</span>
+                            <span data-count="like">{{ question.likes_count }}</span>
                         </button>
 
                         <button type="button" class="btn btn-sm" data-id="{{ question.id }}" data-type="question" data-action="dislike" title="Dislike">
                             <img src="{% static 'img/dislike.png' %}" width="17px">
-                            <span data-count="dislike">{{ question.likes.dislikes.count }}</span>
+                            <span data-count="dislike">{{ question.dislikes_count }}</span>
                         </button>
                     </div>
                 </div>
@@ -26,12 +26,12 @@
                     <div class="likes">
                         <button disabled type="button" class="btn btn-sm">
                             <img src="{% static 'img/like.png' %}" width="17px">
-                            <span data-count="like">{{ question.likes.likes.count }}</span>
+                            <span data-count="like">{{ question.likes_count }}</span>
                         </button>
 
                         <button disabled type="button" class="btn btn-sm" >
                             <img src="{% static 'img/dislike.png' %}" width="17px">
-                            <span data-count="dislike">{{ question.likes.dislikes.count }}</span>
+                            <span data-count="dislike">{{ question.dislikes_count }}</span>
                         </button>
                     </div>
                 </div>

@@ -10,12 +10,12 @@
                     <div class="likes">
                         <button type="button" class="btn btn-sm" data-id="{{ answer.id }}" data-type="answer" data-action="like" title="Like">
                             <img src="{% static 'img/like.png' %}" width="17px">
-                            <span data-count="like">{{ answer.likes.likes.count }}</span>
+                            <span data-count="like">{{ answer.likes_count }}</span>
                         </button>
 
                         <button type="button" class="btn btn-sm" data-id="{{ answer.id }}" data-type="answer" data-action="dislike" title="Dislike">
                             <img src="{% static 'img/dislike.png' %}" width="17px">
-                            <span data-count="dislike">{{ answer.likes.dislikes.count }}</span>
+                            <span data-count="dislike">{{ answer.dislikes_count }}</span>
                         </button>
                     </div>
                 </div>
@@ -24,12 +24,12 @@
                     <div class="likes">
                         <button disabled type="button" class="btn btn-sm">
                             <img src="{% static 'img/like.png' %}" width="17px">
-                            <span data-count="like">{{ answer.likes.likes.count }}</span>
+                            <span data-count="like">{{ answer.likes_count }}</span>
                         </button>
 
                         <button disabled type="button" class="btn btn-sm" >
                             <img src="{% static 'img/dislike.png' %}" width="17px">
-                            <span data-count="dislike">{{ answer.likes.dislikes.count }}</span>
+                            <span data-count="dislike">{{ answer.dislikes_count }}</span>
                         </button>
                     </div>
                 </div>
@@ -51,7 +51,6 @@
                         <input type="checkbox" checked id="{{ answer.id }}" onclick="correct({{ answer.id }})" title="Correct"> Correct!
                     {% else %}
                         <input type="checkbox" id="{{ answer.id }}" onclick="correct({{ answer.id }})" title="Correct"> Correct!
-                        {% comment %}<input type="checkbox" data-id="{{ answer.id }}" data-type="answer" data-action="correct" title="Correct"> Correct!{% endcomment %}
                     {%  endif %}
                 </div>
             {% else %}

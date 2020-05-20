@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, F
 
 
 class QuestionManager(models.Manager):
@@ -18,7 +18,9 @@ class QuestionManager(models.Manager):
         return questions_by_tag
 
     def get_questions_by_rating(self):
-        questions_by_tag = self.get_queryset().order_by('-rating')
+        #questions_by_tag = self.get_queryset().all().order_by('-make_time')
+        #questions_by_tag = self.get_queryset().order_by('-rating')
+        questions_by_tag = self.get_queryset().annotate(fieldsum=F('likes_count') - F('dislikes_count')).order_by('-fieldsum')
         return questions_by_tag
 
     def get_question_by_id(self, question_id):
@@ -86,7 +88,9 @@ class Question(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)  # удалить объект, если удален объект автора
     tags = models.ManyToManyField(Tag, blank=True)
     likes = GenericRelation(Like)
-    rating = models.IntegerField(default=0, null=False, verbose_name='Рейтинг')
+    #rating = models.IntegerField(default=0, null=False, verbose_name='Рейтинг')
+    likes_count = models.IntegerField(default=0, verbose_name='Количество лайков')
+    dislikes_count = models.IntegerField(default=0, verbose_name='Количество дизлайков')
     answers_count = models.IntegerField(default=0, null=False, verbose_name='Количество ответов')
     objects = QuestionManager()
 
@@ -101,7 +105,9 @@ class Answer(models.Model):
     correct_mark = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     likes = GenericRelation(Like)
-    rating = models.IntegerField(default=0, null=False, verbose_name='Рейтинг')
+    #rating = models.IntegerField(default=0, null=False, verbose_name='Рейтинг')
+    likes_count = models.IntegerField(default=0, verbose_name='Количество лайков')
+    dislikes_count = models.IntegerField(default=0, verbose_name='Количество дизлайков')
     objects = AnswerManager()
 
     def __str__(self):

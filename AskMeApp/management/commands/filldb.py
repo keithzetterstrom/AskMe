@@ -44,7 +44,10 @@ class Command(BaseCommand):
             for i in range(randint(0, 40)):
                 v = choice(vote)
                 q.likes.create(user=User(author_ids[i]), vote=v)
-                q.rating += v
+                if v > 0:
+                    q.likes_count += 1
+                else:
+                    q.dislikes_count += 1
                 q.save()
 
             for i in range(randint(0, 6)):
@@ -71,7 +74,10 @@ class Command(BaseCommand):
             for i in range(randint(0, 40)):
                 v = choice(vote)
                 a.likes.create(user=User(author_ids[i]), vote=v)
-                a.rating += v
+                if v > 0:
+                    a.likes_count += 1
+                else:
+                    a.dislikes_count += 1
                 a.save()
 
     def fill_likes(self):
