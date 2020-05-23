@@ -1,5 +1,4 @@
 import json
-
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
@@ -13,30 +12,9 @@ from django.views import View
 from AskMe.settings import enable_urls
 from .models import Question, Like, Answer
 from .forms import LoginForm, QuestionForm, AnswerForm, SettingsForm, RegisterForm
-#from cursor_pagination import CursorPaginator
-
-
-def paginate_large_data(qs, page, elements_in_page):
-    if not page:
-        page = 1
-    qs_len = qs.count()
-    print(qs_len)
-    if qs_len % elements_in_page:
-        page_count = int(qs_len / elements_in_page) + 1
-    else:
-        page_count = int(qs_len / elements_in_page)
-    if int(page) > page_count:
-        left = (page_count - 1) * elements_in_page
-        right = qs_len
-    else:
-        left = (int(page) - 1) * elements_in_page
-        right = int(page) * elements_in_page
-    return qs[left:right]
 
 
 def create_paginator(data, elements_in_page, page):
-    #data = paginate_large_data(qs, page, elements_in_page)
-    print(data.count())
     paginator = Paginator(data, elements_in_page)
     try:
         posts = paginator.page(page)
@@ -47,40 +25,6 @@ def create_paginator(data, elements_in_page, page):
         # Если страница больше максимальной, доставить последнюю страницу результатов
         posts = paginator.page(paginator.num_pages)
     return posts
-
-
-# def posts_api(request, data, after=None):
-#     page_size = 20
-#     paginator = CursorPaginator(data, ordering=('-created', '-id'))
-#     page = paginator.page(first=page_size, after=after)
-#     context = {
-#         'objects': [serialize_page(p) for p in page],
-#         'has_next_page': page.has_next,
-#         'last_cursor': paginator.cursor(page[-1])
-#     }
-#     return data
-
-
-# def chunked_queryset_iterator(queryset, size, *, ordering=('id',)):
-#     """Split a queryset into chunks.
-#     This can be used instead of ``queryset.iterator()``,
-#     so ``.prefetch_related()`` also works.
-#     .. note::
-#         The ordering must uniquely identify the object,
-#         and be in the same order (ASC/DESC).
-#     """
-#     pager = CursorPaginator(queryset, ordering)
-#     after = None
-#     while True:
-#         page = pager.page(after=after, first=size)
-#         if page:
-#             yield from page.items
-#         else:
-#             return
-#         if not page.has_next:
-#             break
-#         # take last item, next page starts after this.
-#         after = pager.cursor(instance=page[-1])
 
 
 def is_enable_url(some_url):
@@ -185,7 +129,6 @@ def questions(request):
     context.update({'page': page})
     context.update({'posts': posts})
     context.update({'status': 1})
-    print('finish')
     return render(request, 'questions.html', context)
 
 
@@ -240,7 +183,7 @@ def tag(request, tag_name):
 
 def hot(request):
     context = {}
-    questions_qs = Question.objects.get_questions_by_rating()
+    questions_qs = Question.objects.get_questions_by_rating
 
     page = request.GET.get('page')
     posts = create_paginator(questions_qs, 20, page)
@@ -254,13 +197,18 @@ def hot(request):
 def correct_answer(request, pk):
     answer_obj = Answer.objects.get(pk=pk)
     prev_answer_id = -1
+    # если ответ изначально не был выбран как правильный
+    # ставим ему отметку True
     if not answer_obj.correct_mark:
         answer = Answer.objects.get_correct_answer(answer_obj.question.id)
+        # проверяем, есть ли другой ответ, выбранный как верный
+        # если да, убираем отметку и запоминаем id этого ответа
         if answer:
             answer[0].correct_mark = False
             answer[0].save()
             prev_answer_id = answer[0].id
         answer_obj.correct_mark = True
+    # если изначально был выбран верным, снимаем эту отметку
     else:
         answer_obj.correct_mark = False
 
@@ -268,9 +216,7 @@ def correct_answer(request, pk):
     return HttpResponse(
             json.dumps({
                 "prev_answer_id": prev_answer_id,
-            }),
-            content_type="application/json"
-        )
+            }), content_type="application/json")
 
 
 class VotesView(View):
@@ -288,7 +234,6 @@ class VotesView(View):
             # меняем оценку и рейтинг
             if like_dislike.vote is not self.vote_type:
                 like_dislike.vote = self.vote_type
-                #obj.rating += 2 * self.vote_type
                 like_dislike.save(update_fields=['vote'])
                 if self.vote_type > 0:
                     obj.likes_count += 1
@@ -300,7 +245,6 @@ class VotesView(View):
             # если совпадает - отменяем предыдущую оценку,
             # обновляем рейтинг, удаляем модель лайка
             else:
-                #obj.rating -= self.vote_type
                 like_dislike.delete()
                 if self.vote_type > 0:
                     obj.likes_count -= 1
@@ -310,7 +254,6 @@ class VotesView(View):
         # если ранне оценок не было создаем модель лайка и обновляем рейтинг
         except Like.DoesNotExist:
             obj.likes.create(user=request.user, vote=self.vote_type)
-            #obj.rating += self.vote_type
             if self.vote_type > 0:
                 obj.likes_count += 1
             else:

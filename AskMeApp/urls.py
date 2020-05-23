@@ -1,6 +1,5 @@
 from django.conf.urls import url
 from django.contrib.auth.decorators import login_required
-
 from . import views
 from .models import Like, Question, Answer
 from .views import VotesView

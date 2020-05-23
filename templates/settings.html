@@ -34,21 +34,14 @@
                 </div>
             </div>
 
-            {% comment %}<div class="form-group row">
-                <label for="nick_name" class="col-md-4 col-form-label text-md-left">NickName</label>
-                <div class="col-md-6">
-                    <input type="text" id="nick_name" class="form-control" name="nick_name">
-                </div>
-            </div>{% endcomment %}
-
             <div class="form-group row">
                 <label for="upload_avatar" class="col-md-4 col-form-label text-md-left">Upload avatar</label>
                 <div class="col-md-6">
                     <img src="{{ user.avatar.url }}" id="upload_avatar" alt="photo">
 
                     <div class="my-3">
+                        {{ form.avatar.errors }}
                         {{ form.avatar }}
-{#                        <input type="file" id="upload_avatar" multiple accept="image/*,image/jpeg" name="upload_avatar">#}
                     </div>
                 </div>
             </div>

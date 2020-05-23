@@ -1,20 +1,14 @@
+from PIL import Image
 from django import forms
 from django.contrib.auth import authenticate
 from django.forms import ModelForm
-
-from AskMeApp.models import User, Question, Answer, Tag
+from AskMeApp.models import User, Question, Answer
 
 
 class LoginForm(forms.Form):
     username = forms.CharField()
     password = forms.CharField(widget=forms.PasswordInput)
 
-    # def clean_username(self):s
-    #     username = self.cleaned_data['username']
-    #     if ' ' in username:
-    #         #self.add_error('username', 'username contanes probel')
-    #         raise
-    #     return username
     def clean(self):
         super().clean()
         username = self.cleaned_data.get('username')
@@ -37,6 +31,25 @@ class RegisterForm(ModelForm):
             'avatar': forms.ClearableFileInput()
         }
 
+    def clean_avatar(self):
+        image = self.cleaned_data.get('avatar')
+
+        try:
+            img = Image.open(image.file)
+            if img.format not in ('JPG', 'PNG', 'JPEG'):
+                raise forms.ValidationError("Invalid image type. Please upload jpg, png or jpeg")
+
+            max_size = 64
+            if any(dim > max_size for dim in image.image.size):
+                fmt = img.format.lower()
+                img.thumbnail((max_size, max_size))
+                image.file = type(image.file)()
+                img.save(image.file, fmt)
+            return image
+
+        except Exception:
+            raise forms.ValidationError("Invalid image type. Please upload jpg, png or jpeg")
+
     def clean(self):
         cd = super().clean()
         if cd['password'] != cd['repeat_password']:
@@ -44,7 +57,9 @@ class RegisterForm(ModelForm):
 
     def save(self, commit=True):
         cd = self.cleaned_data
-        user = User.objects.create_user(username=cd['username'], password=cd['password'], email=cd['email'],
+        user = User.objects.create_user(username=cd['username'],
+                                        password=cd['password'],
+                                        email=cd['email'],
                                         avatar=cd['avatar'])
         return user
 
@@ -67,6 +82,25 @@ class SettingsForm(ModelForm):
             'email': forms.EmailInput(),
             'avatar': forms.FileInput()
         }
+
+    def clean_avatar(self):
+        image = self.cleaned_data.get('avatar')
+
+        try:
+            img = Image.open(image.file)
+            if img.format not in ('JPG', 'PNG', 'JPEG'):
+                raise forms.ValidationError("Invalid image type. Please upload jpg, png or jpeg")
+
+            max_size = 64
+            if any(dim > max_size for dim in image.image.size):
+                fmt = img.format.lower()
+                img.thumbnail((max_size, max_size))
+                image.file = type(image.file)()
+                img.save(image.file, fmt)
+            return image
+
+        except Exception:
+            raise forms.ValidationError("Invalid image type. Please upload jpg, png or jpeg")
 
 
 class AnswerForm(ModelForm):

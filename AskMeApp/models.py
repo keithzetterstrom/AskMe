@@ -1,15 +1,14 @@
+from PIL import Image
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Count, Sum, F
+from django.db.models import Sum, F
 
 
 class QuestionManager(models.Manager):
     def get_new_questions(self):
-        # new_questions = self.get_queryset().all().order_by('-make_time'). \
-        #     annotate(num_answer=Count('answer'), rating=Sum('likes_question__vote'))
-        new_questions = self.get_queryset().all().order_by('-make_time')
+        new_questions = self.all().prefetch_related('author').order_by('-make_time')
         return new_questions
 
     def get_questions_by_tag(self, tag):
@@ -17,11 +16,11 @@ class QuestionManager(models.Manager):
             .filter(tags__tag_name=tag)
         return questions_by_tag
 
+    @property
     def get_questions_by_rating(self):
-        #questions_by_tag = self.get_queryset().all().order_by('-make_time')
-        #questions_by_tag = self.get_queryset().order_by('-rating')
-        questions_by_tag = self.get_queryset().annotate(fieldsum=F('likes_count') - F('dislikes_count')).order_by('-fieldsum')
-        return questions_by_tag
+        questions_by_rating = self.prefetch_related('author').annotate(field_sum=F('likes_count') - F('dislikes_count')).\
+            order_by('-field_sum')
+        return questions_by_rating
 
     def get_question_by_id(self, question_id):
         question_by_id = self.get_queryset().get(id=question_id)
@@ -41,15 +40,16 @@ class AnswerManager(models.Manager):
         answer = self.get_queryset().filter(question=Question(question_id), correct_mark=True)
         return answer
 
+
 class LikeDislikeManager(models.Manager):
     use_for_related_fields = True
 
     def likes(self):
-        # We take the queryset with records greater than 0
+        # Возвратить лайки
         return self.get_queryset().filter(vote__gt=0)
 
     def dislikes(self):
-        # We take the queryset with records less than 0
+        # возвратить дизлайки
         return self.get_queryset().filter(vote__lt=0)
 
     def sum_rating(self):
@@ -62,7 +62,7 @@ class User(AbstractUser):
 
 
 class Tag(models.Model):
-    tag_name = models.CharField(max_length=70, verbose_name=u"Название тэга")
+    tag_name = models.CharField(max_length=70, unique=True, verbose_name=u"Название тэга")
 
     def __str__(self):
         return f'{self.tag_name}'
@@ -88,7 +88,6 @@ class Question(models.Model):
     author = models.ForeignKey(User, on_delete=models.CASCADE)  # удалить объект, если удален объект автора
     tags = models.ManyToManyField(Tag, blank=True)
     likes = GenericRelation(Like)
-    #rating = models.IntegerField(default=0, null=False, verbose_name='Рейтинг')
     likes_count = models.IntegerField(default=0, verbose_name='Количество лайков')
     dislikes_count = models.IntegerField(default=0, verbose_name='Количество дизлайков')
     answers_count = models.IntegerField(default=0, null=False, verbose_name='Количество ответов')
@@ -105,7 +104,6 @@ class Answer(models.Model):
     correct_mark = models.BooleanField(default=False)
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     likes = GenericRelation(Like)
-    #rating = models.IntegerField(default=0, null=False, verbose_name='Рейтинг')
     likes_count = models.IntegerField(default=0, verbose_name='Количество лайков')
     dislikes_count = models.IntegerField(default=0, verbose_name='Количество дизлайков')
     objects = AnswerManager()
