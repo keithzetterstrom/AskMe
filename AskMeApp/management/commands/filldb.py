@@ -1,7 +1,7 @@
 import random
 from django.core.management.base import BaseCommand
 from faker import Faker
-from AskMeApp.models import Question, User, Answer, Tag, Like
+from AskMeApp.models import Question, User, Answer, Tag
 
 f = Faker()
 tags_lst = ['Python', 'SQl', 'C++', 'Django', 'PyCharm', 'C', 'C#', 'JavaScript', 'Java', 'HTML', 'CSS', 'MySQL']
@@ -62,7 +62,7 @@ class Command(BaseCommand):
         for i in range(cnt):
             questions_obj = Question.objects.get(pk=random.choice(questions_ids))
             a = Answer(
-                author=User(random.choice(author_ids)),
+                author_id=random.choice(author_ids),
                 answer_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
                 question=questions_obj,
             )

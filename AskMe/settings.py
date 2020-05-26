@@ -127,6 +127,8 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+#STATIC_ROOT = (os.path.join(BASE_DIR, 'static'))
+
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, "static"),
@@ -139,9 +141,6 @@ MEDIA_URL = '/uploads/'
 AUTH_USER_MODEL = 'AskMeApp.User'
 
 LOGIN_URL = '/AskMe/login/'
-
-enable_urls = (r'login/', r'signup/', r'settings/', r'ask/', r'', r'question/(\d+)/',
-               r'tag/([^/]+)/', r'hot/', r'logout/')
 
 AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',

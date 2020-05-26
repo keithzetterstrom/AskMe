@@ -45,7 +45,7 @@
                     {{ answer.answer_text }}
                 </p>
             </div>
-            {% if user.id == answer.author.id %}
+            {% if user.id == question.author.id %}
                 <div class="Correct">
                     {% if answer.correct_mark %}
                         <input type="checkbox" checked id="{{ answer.id }}" onclick="correct({{ answer.id }})" title="Correct"> Correct!

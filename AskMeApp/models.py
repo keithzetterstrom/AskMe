@@ -1,9 +1,8 @@
-from PIL import Image
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Sum, F
+from django.db.models import F
 
 
 class QuestionManager(models.Manager):
@@ -12,13 +11,14 @@ class QuestionManager(models.Manager):
         return new_questions
 
     def get_questions_by_tag(self, tag):
-        questions_by_tag = self.get_queryset().order_by('-make_time') \
-            .filter(tags__tag_name=tag)
+        questions_by_tag = self.get_queryset().order_by('-make_time').\
+            filter(tags__tag_name=tag)
         return questions_by_tag
 
     @property
     def get_questions_by_rating(self):
-        questions_by_rating = self.prefetch_related('author').annotate(field_sum=F('likes_count') - F('dislikes_count')).\
+        questions_by_rating = self.prefetch_related('author').\
+            annotate(field_sum=F('likes_count') - F('dislikes_count')).\
             order_by('-field_sum')
         return questions_by_rating
 
@@ -39,21 +39,6 @@ class AnswerManager(models.Manager):
     def get_correct_answer(self, question_id):
         answer = self.get_queryset().filter(question=Question(question_id), correct_mark=True)
         return answer
-
-
-class LikeDislikeManager(models.Manager):
-    use_for_related_fields = True
-
-    def likes(self):
-        # Возвратить лайки
-        return self.get_queryset().filter(vote__gt=0)
-
-    def dislikes(self):
-        # возвратить дизлайки
-        return self.get_queryset().filter(vote__lt=0)
-
-    def sum_rating(self):
-        return self.get_queryset().aggregate(Sum('vote')).get('vote__sum') or 0
 
 
 class User(AbstractUser):
@@ -77,8 +62,6 @@ class Like(models.Model):
     content_type = models.ForeignKey(ContentType, on_delete=models.CASCADE)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
-
-    objects = LikeDislikeManager()
 
 
 class Question(models.Model):

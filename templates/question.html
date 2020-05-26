@@ -59,7 +59,7 @@
         {% if answers %}
             {% for answer in answers %}
                 <div class="my-3">
-                    {% include 'inc/answer.html' with answer=answer %}
+                    {% include 'inc/answer.html' with answer=answer question=question %}
                 </div>
             {% endfor %}
             {% include 'inc/pagination.html' with page=answers %}

@@ -7,9 +7,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.http import urlencode
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
-from re import fullmatch
 from django.views import View
-from AskMe.settings import enable_urls
 from .models import Question, Like, Answer
 from .forms import LoginForm, QuestionForm, AnswerForm, SettingsForm, RegisterForm
 
@@ -27,19 +25,12 @@ def create_paginator(data, elements_in_page, page):
     return posts
 
 
-def is_enable_url(some_url):
-    for url in enable_urls:
-        enable_url = r'/AskMe/' + url
-        if fullmatch(enable_url, some_url):
-            return True
-    return False
-
-
 def index(request):
     return HttpResponse('hello')
 
 
 def sign_in(request):
+    # если пользователь авторизован, вернуть его на страницу вопросов
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('ask_me:questions'))
     if request.method == 'POST':
@@ -47,14 +38,13 @@ def sign_in(request):
         if form.is_valid():
             cd = form.cleaned_data
             user = authenticate(username=cd['username'], password=cd['password'])
+            # проверяем, есть ли такой пользователь
             if user is not None:
                 if user.is_active:
+                    # авторизируем пользователя
                     login(request, user)
                     next_page = request.POST.get('next', '/')
-                    if is_enable_url(next_page):
-                        return HttpResponseRedirect(next_page)
-                    else:
-                        return HttpResponse('Bad page')
+                    return HttpResponseRedirect(next_page)
                 else:
                     return HttpResponse('Disabled account')
     else:
@@ -69,6 +59,7 @@ def sign_out(request):
 
 
 def sign_up(request):
+    # если пользователь авторизован, вернуть его на страницу вопросов
     if request.user.is_authenticated:
         return HttpResponseRedirect(reverse('ask_me:questions'))
     if request.method == 'POST':
@@ -87,7 +78,6 @@ def sign_up(request):
 
 @login_required
 def settings(request):
-    context = {}
     if request.method == 'POST':
         form = SettingsForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
@@ -96,13 +86,12 @@ def settings(request):
             return HttpResponseRedirect(reverse('ask_me:questions'))
     else:
         form = SettingsForm(instance=request.user)
-    context.update({'form': form})
+    context = {'form': form}
     return render(request, 'settings.html', context)
 
 
 @login_required
 def ask(request):
-    context = {}
     if request.method == 'POST':
         form = QuestionForm(request.POST)
         if form.is_valid():
@@ -114,7 +103,7 @@ def ask(request):
             return redirect('ask_me:question', question_id=post.id)
     else:
         form = QuestionForm()
-    context.update({'form': form})
+    context = {'form': form}
     return render(request, 'ask.html', context)
 
 
@@ -141,19 +130,23 @@ def question(request, question_id):
     page = request.GET.get('page')
     posts = create_paginator(answers_qs, 4, page)
 
+    # если пользователь авторизован, отобразить форму для ответа
     if request.user.is_authenticated:
         context.update({'user': request.user})
         if request.method == 'POST':
             form = AnswerForm(request.POST)
             if form.is_valid():
                 cd = form.cleaned_data
+                # сохраняем с условием, что некоторые поля будут добавлены позже
                 post = form.save(commit=False)
+                # добавляем автора ответа
                 post.author = request.user
+                # добавляем вопрос на который написан ответ
                 post.question = question_obj
                 post.save()
                 question_obj.answers_count += 1
                 question_obj.save()
-                # как это сделать лучше?
+                # берем страницу пагинатора ответов для редиректа на созданный ответ
                 get_args_str = urlencode({'page': 1})
                 url = '/AskMe/question/' + str(question_obj.id) + '/?' + get_args_str
                 return HttpResponseRedirect(url)
@@ -196,6 +189,8 @@ def hot(request):
 
 def correct_answer(request, pk):
     answer_obj = Answer.objects.get(pk=pk)
+    if request.user != answer_obj.question.author:
+        return HttpResponse('Disabled account')
     prev_answer_id = -1
     # если ответ изначально не был выбран как правильный
     # ставим ему отметку True

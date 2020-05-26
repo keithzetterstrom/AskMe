@@ -14,6 +14,7 @@ class LoginForm(forms.Form):
         username = self.cleaned_data.get('username')
         password = self.cleaned_data.get('password')
         user = authenticate(username=username, password=password)
+        # если пользователь не зарегистрирован, возвращаем сообщение об ошибке
         if not user or not user.is_active:
             raise forms.ValidationError("Sorry, that login was invalid. Please try again.")
         return self.cleaned_data
@@ -33,13 +34,14 @@ class RegisterForm(ModelForm):
 
     def clean_avatar(self):
         image = self.cleaned_data.get('avatar')
-
+        # провверяем, является ли файл картинкой и соответствует ли он нужным форматам
         try:
             img = Image.open(image.file)
             if img.format not in ('JPG', 'PNG', 'JPEG'):
                 raise forms.ValidationError("Invalid image type. Please upload jpg, png or jpeg")
 
             max_size = 64
+            # если картинка больше нужного размера, изменяем размер
             if any(dim > max_size for dim in image.image.size):
                 fmt = img.format.lower()
                 img.thumbnail((max_size, max_size))
@@ -47,16 +49,18 @@ class RegisterForm(ModelForm):
                 img.save(image.file, fmt)
             return image
 
-        except Exception:
-            raise forms.ValidationError("Invalid image type. Please upload jpg, png or jpeg")
+        except:
+            return image
 
     def clean(self):
         cd = super().clean()
+        # проверяем соответствие придуманного пароля и повторенного пароля при регистрации
         if cd['password'] != cd['repeat_password']:
             self.add_error('password', 'Password mismatch')
 
     def save(self, commit=True):
         cd = self.cleaned_data
+        # сохранение переопределено, тк стандартнное сохранение user не учитывает аватар
         user = User.objects.create_user(username=cd['username'],
                                         password=cd['password'],
                                         email=cd['email'],
@@ -99,8 +103,8 @@ class SettingsForm(ModelForm):
                 img.save(image.file, fmt)
             return image
 
-        except Exception:
-            raise forms.ValidationError("Invalid image type. Please upload jpg, png or jpeg")
+        except:
+            return image
 
 
 class AnswerForm(ModelForm):
