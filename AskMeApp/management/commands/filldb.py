@@ -43,10 +43,11 @@ class Command(BaseCommand):
             for i in range(random.randint(0, 40)):
                 v = random.choice(vote)
                 q.likes.create(user=User(author_ids[i]), vote=v)
-                if v > 0:
-                    q.likes_count += 1
-                else:
-                    q.dislikes_count += 1
+                q.rating += v
+                # if v > 0:
+                #     q.likes_count += 1
+                # else:
+                #     q.dislikes_count += 1
                 q.save()
 
             for i in range(random.randint(0, 6)):
@@ -60,22 +61,24 @@ class Command(BaseCommand):
         vote = (1, -1)
 
         for i in range(cnt):
-            questions_obj = Question.objects.get(pk=random.choice(questions_ids))
+            #questions_obj = Question.objects.get(pk=random.choice(questions_ids))
             a = Answer(
                 author_id=random.choice(author_ids),
                 answer_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
-                question=questions_obj,
+                #question=questions_obj,
+                question_id=random.choice(questions_ids),
             )
             a.save()
-            questions_obj.answers_count += 1
-            questions_obj.save()
+            #questions_obj.answers_count += 1
+            #questions_obj.save()
             for i in range(random.randint(0, 40)):
                 v = random.choice(vote)
                 a.likes.create(user=User(author_ids[i]), vote=v)
-                if v > 0:
-                    a.likes_count += 1
-                else:
-                    a.dislikes_count += 1
+                a.rating += v
+                # if v > 0:
+                #     a.likes_count += 1
+                # else:
+                #     a.dislikes_count += 1
                 a.save()
 
     def fill_db(self):

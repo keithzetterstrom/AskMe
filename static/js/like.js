@@ -12,8 +12,9 @@ function like() {
         type : 'POST',
         data : { 'obj' : pk },
         success : function (json) {
-            like.find("[data-count='like']").text(json.like_count);
-            dislike.find("[data-count='dislike']").text(json.dislike_count);
+            document.getElementById("rating_"+pk).innerText = json.rating;
+            //like.find("[data-count='like']").text(json.like_count);
+            //dislike.find("[data-count='dislike']").text(json.dislike_count);
         }
     });
     return false;
@@ -32,8 +33,9 @@ function dislike() {
         data: {'obj': pk},
 
         success: function (json) {
-            like.find("[data-count='like']").text(json.like_count);
-            dislike.find("[data-count='dislike']").text(json.dislike_count);
+            document.getElementById("rating_"+pk).innerText = json.rating;
+            //like.find("[data-count='like']").text(json.like_count);
+            //dislike.find("[data-count='dislike']").text(json.dislike_count);
         }
     });
 

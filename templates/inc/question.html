@@ -3,32 +3,30 @@
 <div class="media mx-5 border border-secondary rounded">
         <div class="col-auto mt-3">
             <img src="{{question.author.avatar.url}}" class="img-fluid rounded" alt="...">
-
+            <p class="text-center font-weight-bold mt-3 mb-1">
+                <div class="text-center" id="rating_{{ question.id }}">{{ question.rating }}</div>
+            </p>
             {% if user.is_authenticated %}
                 <div class="row mt-3">
                     <div class="likes">
-                        <button type="button" class="btn btn-sm" data-id="{{ question.id }}" data-type="question" data-action="like" title="Like">
+                        <button type="button" name="like_btn" class="mx-2" data-id="{{ question.id }}" data-type="question" data-action="like" title="Like">
                             <img src="{% static 'img/like.png' %}" width="17px">
-                            <span data-count="like">{{ question.likes_count }}</span>
                         </button>
 
-                        <button type="button" class="btn btn-sm" data-id="{{ question.id }}" data-type="question" data-action="dislike" title="Dislike">
+                        <button type="button" name="like_btn" class="" data-id="{{ question.id }}" data-type="question" data-action="dislike" title="Dislike">
                             <img src="{% static 'img/dislike.png' %}" width="17px">
-                            <span data-count="dislike">{{ question.dislikes_count }}</span>
                         </button>
                     </div>
                 </div>
             {% else %}
                 <div class="row mt-3">
                     <div class="likes">
-                        <button disabled type="button" class="btn btn-sm">
+                        <button disabled type="button" name="like_btn" class="mx-2">
                             <img src="{% static 'img/like.png' %}" width="17px">
-                            <span data-count="like">{{ question.likes_count }}</span>
                         </button>
 
-                        <button disabled type="button" class="btn btn-sm" >
+                        <button disabled type="button" name="like_btn" class="" >
                             <img src="{% static 'img/dislike.png' %}" width="17px">
-                            <span data-count="dislike">{{ question.dislikes_count }}</span>
                         </button>
                     </div>
                 </div>

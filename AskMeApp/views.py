@@ -144,7 +144,7 @@ def question(request, question_id):
                 # добавляем вопрос на который написан ответ
                 post.question = question_obj
                 post.save()
-                question_obj.answers_count += 1
+                #question_obj.answers_count += 1
                 question_obj.save()
                 # берем страницу пагинатора ответов для редиректа на созданный ответ
                 get_args_str = urlencode({'page': 1})
@@ -230,37 +230,25 @@ class VotesView(View):
             if like_dislike.vote is not self.vote_type:
                 like_dislike.vote = self.vote_type
                 like_dislike.save(update_fields=['vote'])
-                if self.vote_type > 0:
-                    obj.likes_count += 1
-                    obj.dislikes_count -= 1
-                else:
-                    obj.likes_count -= 1
-                    obj.dislikes_count += 1
+                obj.rating += 2 * self.vote_type
                 result = True
             # если совпадает - отменяем предыдущую оценку,
             # обновляем рейтинг, удаляем модель лайка
             else:
                 like_dislike.delete()
-                if self.vote_type > 0:
-                    obj.likes_count -= 1
-                else:
-                    obj.dislikes_count -= 1
+                obj.rating -= self.vote_type
                 result = False
         # если ранне оценок не было создаем модель лайка и обновляем рейтинг
         except Like.DoesNotExist:
             obj.likes.create(user=request.user, vote=self.vote_type)
-            if self.vote_type > 0:
-                obj.likes_count += 1
-            else:
-                obj.dislikes_count += 1
+            obj.rating += self.vote_type
             result = True
 
         obj.save()
         return HttpResponse(
             json.dumps({
                 "result": result,
-                "like_count": obj.likes_count,
-                "dislike_count": obj.dislikes_count,
+                "rating": obj.rating,
             }),
             content_type="application/json"
         )
