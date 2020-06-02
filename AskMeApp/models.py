@@ -12,7 +12,7 @@ class QuestionManager(models.Manager):
         return new_questions
 
     def get_questions_by_tag(self, tag):
-        questions_by_tag = self.get_queryset().order_by('-make_time').\
+        questions_by_tag = self.all().prefetch_related('author').order_by('-make_time').\
             annotate(answers_count=Count('answer')).filter(tags__tag_name=tag)
         return questions_by_tag
 
@@ -48,7 +48,7 @@ class User(AbstractUser):
 
 
 class Tag(models.Model):
-    tag_name = models.CharField(max_length=70, unique=True, verbose_name=u"Название тэга")
+    tag_name = models.CharField(max_length=70, unique=True, verbose_name=u"Название тэга", db_index=True)
 
     def __str__(self):
         return f'{self.tag_name}'
@@ -68,11 +68,11 @@ class Like(models.Model):
 class Question(models.Model):
     title = models.CharField(max_length=200, verbose_name=u"Заголовок вопроса")
     question_text = models.TextField(verbose_name=u"Текст вопроса")
-    make_time = models.DateTimeField(auto_now_add=True, verbose_name=u"Время создания")
+    make_time = models.DateTimeField(auto_now_add=True, verbose_name=u"Время создания", db_index=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE)  # удалить объект, если удален объект автора
     tags = models.ManyToManyField(Tag, blank=True)
     likes = GenericRelation(Like)
-    rating = models.IntegerField(default=0, verbose_name='Рейтинг')
+    rating = models.IntegerField(default=0, verbose_name='Рейтинг', db_index=True)
     #answers_count = models.IntegerField(default=0, null=False, verbose_name='Количество ответов')
     objects = QuestionManager()
 

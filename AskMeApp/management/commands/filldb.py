@@ -17,77 +17,68 @@ class Command(BaseCommand):
         parser.add_argument('--questions', type=int)
         parser.add_argument('--answers', type=int)
 
-    def fill_tags(self):
-        for t in tags_lst:
-            Tag.objects.create(tag_name=t)
-
     def fill_authors(self, cnt):
         for i in range(cnt):
-            u = User(username=f.name())
-            #u = User(username=i)
-            u.save()
+            User.objects.create(username=f.name())
+            # u = User(username=f.name())
+            # u = User(username=i)
+            # u.save()
 
     def fill_questions(self, cnt):
         author_ids = list(User.objects.values_list('id', flat=True))
-        tag_ids = list(Tag.objects.values_list('id', flat=True))
-        vote = (1, -1)
 
         for i in range(cnt):
-            q = Question(
+            vote = random.choice(range(-30, 50))
+            Question.objects.create(
                 author_id=random.choice(author_ids),
                 question_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
                 title=f.sentence()[:200],
+                rating=vote,
             )
-            q.save()
+            # q = Question(
+            #     author_id=random.choice(author_ids),
+            #     question_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
+            #     title=f.sentence()[:200],
+            #     rating=vote,
+            # )
+            # q.save()
 
-            for i in range(random.randint(0, 40)):
-                v = random.choice(vote)
-                q.likes.create(user=User(author_ids[i]), vote=v)
-                q.rating += v
-                # if v > 0:
-                #     q.likes_count += 1
-                # else:
-                #     q.dislikes_count += 1
-                q.save()
-
-            for i in range(random.randint(0, 6)):
-                tag = random.choice(tag_ids)
-                if tag not in q.tags.values_list('id'):
-                    q.tags.add(tag)
+    def fill_tags(self):
+        questions_ids = list(Question.objects.values_list('id', flat=True))
+        for i in tags_lst:
+            t = Tag(tag_name=i)
+            t.save()
+            for j in random.sample(questions_ids, random.choice(range(10, 50))):
+                t.question_set.add(j)
 
     def fill_answers(self, cnt):
         author_ids = list(User.objects.values_list('id', flat=True))
         questions_ids = list(Question.objects.values_list('id', flat=True))
-        vote = (1, -1)
 
         for i in range(cnt):
-            #questions_obj = Question.objects.get(pk=random.choice(questions_ids))
-            a = Answer(
+            votes = random.choice(range(-30, 50))
+            Answer.objects.create(
                 author_id=random.choice(author_ids),
                 answer_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
-                #question=questions_obj,
                 question_id=random.choice(questions_ids),
+                rating=votes,
             )
-            a.save()
-            #questions_obj.answers_count += 1
-            #questions_obj.save()
-            for i in range(random.randint(0, 40)):
-                v = random.choice(vote)
-                a.likes.create(user=User(author_ids[i]), vote=v)
-                a.rating += v
-                # if v > 0:
-                #     a.likes_count += 1
-                # else:
-                #     a.dislikes_count += 1
-                a.save()
+            # a = Answer(
+            #     author_id=random.choice(author_ids),
+            #     answer_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
+            #     question_id=random.choice(questions_ids),
+            #     rating=votes,
+            # )
+            # a.save()
 
     def fill_db(self):
-        self.fill_tags()
-        self.fill_authors(50)
+        self.fill_authors(100)
         print('authors done')
-        self.fill_questions(100)
+        self.fill_questions(500)
         print('questions done')
-        self.fill_answers(200)
+        self.fill_tags()
+        print('tags done')
+        self.fill_answers(1000)
         print('answers done')
 
     def handle(self, *args, **options):
