@@ -99,6 +99,8 @@ def ask(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
+            for t in cd['tags']:
+                post.tags.add(t)
             form.save_m2m()
             return redirect('ask_me:question', question_id=post.id)
     else:
@@ -144,8 +146,6 @@ def question(request, question_id):
                 # добавляем вопрос на который написан ответ
                 post.question = question_obj
                 post.save()
-                #question_obj.answers_count += 1
-                question_obj.save()
                 # берем страницу пагинатора ответов для редиректа на созданный ответ
                 get_args_str = urlencode({'page': 1})
                 url = '/AskMe/question/' + str(question_obj.id) + '/?' + get_args_str

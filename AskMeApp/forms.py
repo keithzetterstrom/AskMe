@@ -1,8 +1,10 @@
+import string
 from PIL import Image
 from django import forms
 from django.contrib.auth import authenticate
+from django.db import transaction
 from django.forms import ModelForm
-from AskMeApp.models import User, Question, Answer
+from AskMeApp.models import User, Question, Answer, Tag
 
 
 class LoginForm(forms.Form):
@@ -69,13 +71,33 @@ class RegisterForm(ModelForm):
 
 
 class QuestionForm(ModelForm):
+    tags = forms.CharField()
+
     class Meta:
         model = Question
-        fields = ['title', 'question_text', 'tags']
+        fields = ['title', 'question_text']
         widgets = {
             'question_text': forms.Textarea(),
-            'tags': forms.CheckboxSelectMultiple(),
+            # 'tags': forms.CheckboxSelectMultiple(),
         }
+
+    def clean_tags(self):
+        tags_set = self.cleaned_data.get('tags')
+        tags_ids = []
+        tags_lst = tags_set.split(' ')
+        for tag in tags_lst:
+            if not tag:
+                continue
+            tt = str.maketrans("", "", ".,;")
+            tag_name = tag.translate(tt)
+            try:
+                with transaction.atomic():
+                    tag_obj = Tag(tag_name=tag_name)
+                    tag_obj.save()
+                    tags_ids.append(tag_obj.id)
+            except:
+                tags_ids.append(Tag.objects.get(tag_name=tag_name).id)
+        return tags_ids
 
 
 class SettingsForm(ModelForm):

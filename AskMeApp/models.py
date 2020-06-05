@@ -44,11 +44,13 @@ class AnswerManager(models.Manager):
 
 class User(AbstractUser):
     avatar = models.ImageField(blank=True, upload_to='avatars', default='avatar.jpeg')
+    rating = models.IntegerField(default=0)
     USERNAME_FIELD = 'username'
 
 
 class Tag(models.Model):
     tag_name = models.CharField(max_length=70, unique=True, verbose_name=u"Название тэга", db_index=True)
+    questions_count = models.IntegerField(default=0)
 
     def __str__(self):
         return f'{self.tag_name}'

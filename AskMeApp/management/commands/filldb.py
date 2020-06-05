@@ -20,9 +20,6 @@ class Command(BaseCommand):
     def fill_authors(self, cnt):
         for i in range(cnt):
             User.objects.create(username=f.name())
-            # u = User(username=f.name())
-            # u = User(username=i)
-            # u.save()
 
     def fill_questions(self, cnt):
         author_ids = list(User.objects.values_list('id', flat=True))
@@ -35,13 +32,6 @@ class Command(BaseCommand):
                 title=f.sentence()[:200],
                 rating=vote,
             )
-            # q = Question(
-            #     author_id=random.choice(author_ids),
-            #     question_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
-            #     title=f.sentence()[:200],
-            #     rating=vote,
-            # )
-            # q.save()
 
     def fill_tags(self):
         questions_ids = list(Question.objects.values_list('id', flat=True))
@@ -63,13 +53,6 @@ class Command(BaseCommand):
                 question_id=random.choice(questions_ids),
                 rating=votes,
             )
-            # a = Answer(
-            #     author_id=random.choice(author_ids),
-            #     answer_text='. '.join(f.sentences(f.random_int(min=2, max=5))),
-            #     question_id=random.choice(questions_ids),
-            #     rating=votes,
-            # )
-            # a.save()
 
     def fill_db(self):
         self.fill_authors(100)
