@@ -8,7 +8,9 @@ from django.utils.http import urlencode
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
 from django.views import View
-from .models import Question, Like, Answer
+from django.views.decorators.cache import cache_page
+
+from .models import Question, Like, Answer, User
 from .forms import LoginForm, QuestionForm, AnswerForm, SettingsForm, RegisterForm
 
 
@@ -252,3 +254,14 @@ class VotesView(View):
             }),
             content_type="application/json"
         )
+
+
+def top_100_nginx(request):
+    users = list(User.objects.order_by('-rating').values_list('username', flat=True)[:100])
+    return render(request, 'top100_nginx.html', {'users': users})
+
+
+@cache_page(600, cache='default', key_prefix='')
+def top_100_app(request):
+    users = list(User.objects.order_by('-rating').values_list('username', flat=True)[:100])
+    return render(request, 'top100_app.html', {'users': users})

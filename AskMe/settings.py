@@ -114,6 +114,13 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': '127.0.0.1:11211',
+    }
+}
+
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
 
@@ -131,13 +138,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-# STATIC_ROOT = (os.path.join(BASE_DIR, 'static'))
-# STATIC_ROOT = 'static'
+STATIC_ROOT = (os.path.join(BASE_DIR, 'static'))
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    '../static/',
-]
+#STATIC_ROOT = 'static'
+
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+#     '../static/',
+# ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 MEDIA_URL = '/uploads/'
@@ -150,6 +158,6 @@ AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
     )
 
-DEBUG_TOOLBAR_CONFIG = {
-    "SHOW_TOOLBAR_CALLBACK" : lambda request: True,
-}
+# DEBUG_TOOLBAR_CONFIG = {
+#       "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+# }

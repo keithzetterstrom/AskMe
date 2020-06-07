@@ -26,4 +26,6 @@ urlpatterns = [
         login_required(VotesView.as_view(model=Answer, vote_type=Like.DISLIKE)), name='answer_dislike'),
     url(r'^js/answer/(?P<pk>\d+)/correct/$',
         login_required(views.correct_answer), name='answer_correct'),
+    url(r'^top100-nginx/$', views.top_100_nginx, name='top100_nginx'),
+    url(r'^top100-app/$', views.top_100_app, name='top100_app'),
 ]

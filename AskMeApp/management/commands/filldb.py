@@ -4,7 +4,10 @@ from faker import Faker
 from AskMeApp.models import Question, User, Answer, Tag
 
 f = Faker()
-tags_lst = ['Python', 'SQl', 'C++', 'Django', 'PyCharm', 'C', 'C#', 'JavaScript', 'Java', 'HTML', 'CSS', 'MySQL']
+# tags_lst = ['Python', 'SQl', 'C++', 'Django', 'PyCharm', 'C',
+#             'C#', 'JavaScript', 'Java', 'HTML', 'CSS', 'MySQL',
+#             'wsgi', 'GO', 'Docker', 'nginx', 'Linux', 'email',
+#             'MySQL', 'database', 'Shadow']
 
 
 class Command(BaseCommand):
@@ -12,14 +15,15 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument('--all', action='store_true')
-        parser.add_argument('--tags',  action='store_true')
         parser.add_argument('--authors', type=int)
         parser.add_argument('--questions', type=int)
+        parser.add_argument('--tags', type=int)
         parser.add_argument('--answers', type=int)
 
     def fill_authors(self, cnt):
         for i in range(cnt):
-            User.objects.create(username=f.name())
+            #User.objects.create(username=f.name())
+            User.objects.create(username=i)
 
     def fill_questions(self, cnt):
         author_ids = list(User.objects.values_list('id', flat=True))
@@ -33,13 +37,17 @@ class Command(BaseCommand):
                 rating=vote,
             )
 
-    def fill_tags(self):
+    def fill_tags(self, cnt):
         questions_ids = list(Question.objects.values_list('id', flat=True))
-        for i in tags_lst:
-            t = Tag(tag_name=i)
-            t.save()
-            for j in random.sample(questions_ids, random.choice(range(10, 50))):
-                t.question_set.add(j)
+        #tags_lst = f.words(cnt)
+        for i in range(0, cnt):
+            try:
+                t = Tag(tag_name=i)
+                t.save()
+                for j in random.sample(questions_ids, random.choice(range(1, 5))):
+                    t.question_set.add(j)
+            except:
+                pass
 
     def fill_answers(self, cnt):
         author_ids = list(User.objects.values_list('id', flat=True))
@@ -55,26 +63,27 @@ class Command(BaseCommand):
             )
 
     def fill_db(self):
-        self.fill_authors(100)
+        self.fill_authors(10000)
         print('authors done')
-        self.fill_questions(500)
+        self.fill_questions(100000)
         print('questions done')
-        self.fill_tags()
+        self.fill_tags(10000)
         print('tags done')
-        self.fill_answers(1000)
+        self.fill_answers(1000000)
         print('answers done')
 
     def handle(self, *args, **options):
         authors = options['authors']
         questions = options['questions']
+        tags = options['tags']
         answers = options['answers']
         if options['all']:
             self.fill_db()
-        if options['tags']:
-            self.fill_tags()
         if authors:
             self.fill_authors(authors)
         if questions:
             self.fill_questions(questions)
+        if tags:
+            self.fill_tags(tags)
         if answers:
             self.fill_answers(answers)
