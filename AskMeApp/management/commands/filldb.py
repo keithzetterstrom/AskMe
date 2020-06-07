@@ -4,10 +4,6 @@ from faker import Faker
 from AskMeApp.models import Question, User, Answer, Tag
 
 f = Faker()
-# tags_lst = ['Python', 'SQl', 'C++', 'Django', 'PyCharm', 'C',
-#             'C#', 'JavaScript', 'Java', 'HTML', 'CSS', 'MySQL',
-#             'wsgi', 'GO', 'Docker', 'nginx', 'Linux', 'email',
-#             'MySQL', 'database', 'Shadow']
 
 
 class Command(BaseCommand):
@@ -44,7 +40,7 @@ class Command(BaseCommand):
             try:
                 t = Tag(tag_name=i)
                 t.save()
-                for j in random.sample(questions_ids, random.choice(range(1, 5))):
+                for j in random.sample(questions_ids, random.choice(range(1, 20))):
                     t.question_set.add(j)
             except:
                 pass

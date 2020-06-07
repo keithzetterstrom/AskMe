@@ -2,7 +2,6 @@ upstream backend {
         server 127.0.0.1:8081;
 }
 
-#proxy_cache_path /var/lib/nginx/proxy_cache levels=1:2 keys_zone=one:5m use_temp_path=off;
 proxy_cache_path /var/lib/nginx/proxy_cache levels=2 keys_zone=ask:10m;
 
 
@@ -25,12 +24,6 @@ server {
 			proxy_pass http://127.0.0.1:8081;
             proxy_cache off;
         }
-
-        #location / {
-        #        proxy_cache one;
-                #proxy_ignore_headers X-Accel-Expires Expires Cache-Control;
-        #        proxy_pass http://127.0.0.1:8081/;
-        #}
 
         location ^~ /uploads/ {
                 alias $askme_root/uploads/;
