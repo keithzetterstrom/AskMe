@@ -7,9 +7,8 @@ class Command(BaseCommand):
     help = 'users_rating'
 
     def rating_user(self):
-        users_ids = list(User.objects.values_list('id', flat=True))
-        for user_id in users_ids:
-            user = User.objects.get(id=user_id)
+        users_objs = User.objects.all()
+        for user in users_objs:
             questions_rating = user.question_set.all().aggregate(questions_rating=Sum('rating'))
             answers_rating = user.answer_set.all().aggregate(answers_rating=Sum('rating'))
             user_rating = 0

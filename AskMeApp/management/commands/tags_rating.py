@@ -6,9 +6,8 @@ class Command(BaseCommand):
     help = 'tags_rating'
 
     def rating_tags(self):
-        tags_ids = list(Tag.objects.values_list('id', flat=True))
-        for tag_id in tags_ids:
-            tag = Tag.objects.get(id=tag_id)
+        tags_objs = Tag.objects.all()
+        for tag in tags_objs:
             count = tag.question_set.all().count()
             tag.questions_count = count
             tag.save()

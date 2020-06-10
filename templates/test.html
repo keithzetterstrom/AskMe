@@ -1,0 +1,22 @@
+{%  load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="https://cdn.jsdelivr.net/gh/centrifugal/centrifuge-js@2.6.2/dist/centrifuge.min.js"></script>
+{% comment %}<script src="{% static '/js/centrifuge.min.js' %}"></script>{% endcomment %}
+<script type="text/javascript">
+        cent = new Centrifuge('ws://127.0.0.1:8001/connection/websocket');
+        cent.setToken("{{ token }}");
+        cent.subscribe('news', function (msg) {
+            var ms = msg.data;
+            //console.log(msg['hello'])
+            alert(ms['hello']);
+        });
+        cent.connect();
+</script>
+</body>
+</html>

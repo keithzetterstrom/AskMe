@@ -9,9 +9,14 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.urls import reverse
 from django.views import View
 from django.views.decorators.cache import cache_page
-
 from .models import Question, Like, Answer, User
 from .forms import LoginForm, QuestionForm, AnswerForm, SettingsForm, RegisterForm
+from cent import Client
+import jwt
+from AskMe.settings import CENTRIFUGE_SECRET, CENTRIFUGE_API_KEY
+
+
+cl = Client('http://127.0.0.1:8001', api_key=CENTRIFUGE_API_KEY, timeout=1)
 
 
 def create_paginator(data, elements_in_page, page):
@@ -103,7 +108,7 @@ def ask(request):
             post.save()
             for t in cd['tags']:
                 post.tags.add(t)
-            form.save_m2m()
+            #form.save_m2m()
             return redirect('ask_me:question', question_id=post.id)
     else:
         form = QuestionForm()
@@ -136,6 +141,8 @@ def question(request, question_id):
 
     # если пользователь авторизован, отобразить форму для ответа
     if request.user.is_authenticated:
+        token = jwt.encode({"sub": str(request.user.id)}, CENTRIFUGE_SECRET).decode()
+        context.update({'token': token})
         context.update({'user': request.user})
         if request.method == 'POST':
             form = AnswerForm(request.POST)
@@ -148,6 +155,11 @@ def question(request, question_id):
                 # добавляем вопрос на который написан ответ
                 post.question = question_obj
                 post.save()
+                cl.publish(str(question_obj.id), {'id': post.id,
+                                                  'author': request.user.username,
+                                                  'text': post.answer_text,
+                                                  'time': str(post.make_time),
+                                                  'avatar': request.user.avatar.url})
                 # берем страницу пагинатора ответов для редиректа на созданный ответ
                 get_args_str = urlencode({'page': 1})
                 url = '/AskMe/question/' + str(question_obj.id) + '/?' + get_args_str
@@ -265,3 +277,10 @@ def top_100_nginx(request):
 def top_100_app(request):
     users = list(User.objects.order_by('-rating').values_list('username', flat=True)[:100])
     return render(request, 'top100_app.html', {'users': users})
+
+
+def test_centrifugo(request):
+    cl.publish('news', {'hello': 'world'})
+    token = jwt.encode({"sub": str(request.user.id)}, CENTRIFUGE_SECRET).decode()
+    print(token)
+    return render(request, 'test.html', {'token': token})

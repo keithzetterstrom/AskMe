@@ -2,7 +2,7 @@ upstream backend {
         server 127.0.0.1:8081;
 }
 
-proxy_cache_path /var/lib/nginx/proxy_cache levels=2 keys_zone=ask:10m;
+#proxy_cache_path /var/lib/nginx/proxy_cache levels=2 keys_zone=ask:10m;
 
 
 server {
@@ -12,9 +12,9 @@ server {
         set $askme_root '/home/keith/PycharmProjectsPro/AskMe';
 
         location / {
-	        proxy_cache ask;
-	        proxy_cache_key $uri;
-	        proxy_cache_valid 200 302 10m;
+	        #proxy_cache ask;
+	        #proxy_cache_key $uri;
+	        #proxy_cache_valid 200 302 10m;
 	        proxy_set_header Host $http_host;
 	        proxy_set_header X-Real-IP $remote_addr;
 	        proxy_pass http://127.0.0.1:8081;

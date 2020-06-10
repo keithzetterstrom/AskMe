@@ -54,7 +54,7 @@
         </div>
     </div>
 
-    <div class=" mx-5 border-bottom border-secondary">
+    <div id="answers" class=" mx-5 border-bottom border-secondary">
         {% if answers %}
             {% for answer in answers %}
                 <div class="my-3">
@@ -73,6 +73,58 @@
             </form>
         </div>
     {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/gh/centrifugal/centrifuge-js@2.6.2/dist/centrifuge.min.js"></script>
+    {% comment %}<script src="{% static '/js/centrifuge.min.js' %}"></script>{% endcomment %}
+    <script type="text/javascript">
+        cent = new Centrifuge('ws://127.0.0.1:8001/connection/websocket');
+        cent.setToken("{{ token }}");
+        cent.subscribe('{{ question.id }}', function (msg) {
+            var ms = msg.data;
+            //console.log(msg['hello'])
+            //alert(ms['hello']);
+            $('#answers').prepend('<div class="my-3">' +
+                '<div class="mx-5 border border-secondary rounded">\n' +
+                '    <div class="row mx-2 my-2">\n' +
+                '        <div class="col-auto">\n' +
+                '            <img src="'+ ms['avatar'] +'" class="img-fluid rounded" alt="..." >\n' +
+                '            <p class="text-center font-weight-bold mt-3 mb-1">\n' +
+                '                <div class="text-center" id="rating_'+ ms['id'] +'"> 0 </div>\n' +
+                '            </p>\n' +
+                    '                <div class="row mt-3">\n'+
+                    '                    <div class="likes">\n'+
+                    '                        <button type="button" name="like_btn" class="mx-2" data-id="'+ ms['id'] +'" data-type="answer" data-action="like" title="Like">\n'
+                    +
+                    '                            <img src="{% static 'img/like.png' %}" width="17px">\n'+
+                    '                        </button>\n'+
+                    '\n'+
+                    '                        <button type="button" name="like_btn" class="" data-id="'+ ms['id'] +'" data-type="answer" data-action="dislike" title="Dislike">\n'
+                    +
+                    '                            <img src="{% static 'img/dislike.png' %}" width="17px">\n'+
+                    '                        </button>\n'+
+                    '                    </div>\n'+
+                    '                </div>\n'+
+                '\n' +
+                '        </div>\n' +
+                '        <div class="col-auto media-body">\n' +
+                '            <div>\n' +
+                '                <h6 class="text-dark mt-2">\n' +
+                '                    '+ ms['author'] +'\n' +
+                '                </h6>\n' +
+                '                <p class="text-break">\n' +
+                '                    '+ ms['text'] +'\n' +
+                '                </p>\n' +
+                '            </div>\n' +
+                '            <div>\n' +
+                '                <p class="text-right text-secondary m-0">'+ ms['time'] +'</p>\n' +
+                '            </div>\n' +
+                '        </div>\n' +
+                '    </div>\n' +
+                '</div>' +
+                '</div>');
+            });
+        cent.connect();
+    </script>
 
 {% endblock %}
 
