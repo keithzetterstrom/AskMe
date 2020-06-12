@@ -2,6 +2,7 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
+from django.db.models import Count, Sum
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.http import urlencode
@@ -14,6 +15,7 @@ from .forms import LoginForm, QuestionForm, AnswerForm, SettingsForm, RegisterFo
 from cent import Client
 import jwt
 from AskMe.settings import CENTRIFUGE_SECRET, CENTRIFUGE_API_KEY
+from django.core.cache import cache
 
 
 cl = Client('http://127.0.0.1:8001', api_key=CENTRIFUGE_API_KEY, timeout=1)
@@ -119,13 +121,14 @@ def ask(request):
 def questions(request):
     context = {}
 
-    questions_qs = Question.objects.get_new_questions()
+    #questions_qs = Question.objects.get_new_questions()
+    questions_qs = Question.objects.prefetch_related('author', 'answer_set').order_by('-make_time')
 
     page = request.GET.get('page')
     posts = create_paginator(questions_qs, 20, page)
 
     context.update({'page': page})
-    context.update({'posts': posts})
+    context.update({'posts': posts.object_list.annotate(answers_count=Count('answer'))})
     context.update({'status': 1})
     return render(request, 'questions.html', context)
 
@@ -158,7 +161,7 @@ def question(request, question_id):
                 cl.publish(str(question_obj.id), {'id': post.id,
                                                   'author': request.user.username,
                                                   'text': post.answer_text,
-                                                  'time': str(post.make_time),
+                                                  'time': post.make_time.strftime(),
                                                   'avatar': request.user.avatar.url})
                 # берем страницу пагинатора ответов для редиректа на созданный ответ
                 get_args_str = urlencode({'page': 1})
@@ -269,13 +272,39 @@ class VotesView(View):
 
 
 def top_100_nginx(request):
-    users = list(User.objects.order_by('-rating').values_list('username', flat=True)[:100])
-    return render(request, 'top100_nginx.html', {'users': users})
+    dct = {}
+    users_objs = User.objects.all()
+    for user in users_objs:
+        questions_rating = user.question_set.all().aggregate(questions_rating=Sum('rating'))
+        answers_rating = user.answer_set.all().aggregate(answers_rating=Sum('rating'))
+        user_rating = 0
+        try:
+            user_rating += questions_rating['questions_rating']
+        except:
+            pass
+        try:
+            user_rating += answers_rating['answers_rating']
+        except:
+            pass
+        dct.update({user.username: user_rating})
+
+    lst_d = list(dct.items())
+    lst_d.sort(key=lambda i: i[1])
+    lst_d.reverse()
+    lst_names = []
+    for i in lst_d[:100]:
+        lst_names.append(i[0])
+    return render(request, 'top100_nginx.html', {'users': lst_names})
 
 
-@cache_page(600, cache='default', key_prefix='')
+# @cache_page(600, cache='default', key_prefix='')
+# def top_100_app_page(request):
+#     users = list(User.objects.order_by('-rating').values_list('username', flat=True)[:100])
+#     return render(request, 'top100_app_page.html', {'users': users})
+
+
 def top_100_app(request):
-    users = list(User.objects.order_by('-rating').values_list('username', flat=True)[:100])
+    users = cache.get('top100_users')[:100]
     return render(request, 'top100_app.html', {'users': users})
 
 
