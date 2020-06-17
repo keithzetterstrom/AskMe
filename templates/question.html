@@ -64,11 +64,19 @@
 
     <div id="answers" class=" mx-5 border-bottom border-secondary">
         {% if answers %}
-            {% for post, like in votes.items %}
-                <div class="my-3">
-                    {% include 'inc/answer.html' with answer=post like=like question=question %}
-                </div>
-            {% endfor %}
+            {% if user.is_authenticated %}
+                {% for post, like in votes.items %}
+                    <div class="my-3">
+                        {% include 'inc/answer.html' with answer=post like=like question=question %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                {% for a in answers %}
+                    <div class="my-3">
+                        {% include 'inc/answer.html' with answer=a question=question %}
+                    </div>
+                {% endfor %}
+            {% endif %}
             {% include 'inc/pagination.html' with page=answers %}
         {% endif %}
     </div>

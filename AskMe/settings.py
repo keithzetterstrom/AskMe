@@ -138,14 +138,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-#STATIC_ROOT = (os.path.join(BASE_DIR, 'static'))
+STATIC_ROOT = (os.path.join(BASE_DIR, 'static'))
 
 #STATIC_ROOT = 'static'
 
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static"),
-    '../static/',
-]
+# STATICFILES_DIRS = [
+#     os.path.join(BASE_DIR, "static"),
+#     '../static/',
+# ]
 
 MEDIA_ROOT = os.path.join(BASE_DIR, "uploads")
 MEDIA_URL = '/uploads/'
@@ -158,9 +158,9 @@ AUTHENTICATION_BACKENDS = (
         'django.contrib.auth.backends.ModelBackend',
     )
 
-DEBUG_TOOLBAR_CONFIG = {
-      "SHOW_TOOLBAR_CALLBACK": lambda request: True,
-}
+# DEBUG_TOOLBAR_CONFIG = {
+#       "SHOW_TOOLBAR_CALLBACK": lambda request: True,
+# }
 
 CENTRIFUGE_SECRET = '87858149-92b2-4000-bd2e-5111e3cf8f25'
 

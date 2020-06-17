@@ -12,11 +12,19 @@
     {% endif %}
     </h2>
     {% if posts %}
-        {% for post, like in votes.items %}
-            <div class="my-4">
-                {% include 'inc/question.html' with question=post like=like%}
-            </div>
-        {% endfor %}
+        {% if user.is_authenticated %}
+            {% for post, like in votes.items %}
+                <div class="my-4">
+                    {% include 'inc/question.html' with question=post like=like%}
+                </div>
+            {% endfor %}
+        {% else %}
+            {% for q in posts %}
+                <div class="my-4">
+                    {% include 'inc/question.html' with question=q%}
+                </div>
+            {% endfor %}
+        {% endif %}
         {% include 'inc/pagination.html' with page=posts %}
     {% else %}
         Nothing to show :(

@@ -333,10 +333,31 @@ def top_100_nginx(request):
     return render(request, 'top100_nginx.html', {'users': lst_names})
 
 
-# @cache_page(600, cache='default', key_prefix='')
-# def top_100_app_page(request):
-#     users = list(User.objects.order_by('-rating').values_list('username', flat=True)[:100])
-#     return render(request, 'top100_app_page.html', {'users': users})
+@cache_page(1800, cache='default', key_prefix='')
+def top_100_app_page(request):
+    dct = {}
+    users_objs = User.objects.all()
+    for user in users_objs:
+        questions_rating = user.question_set.all().aggregate(questions_rating=Sum('rating'))
+        answers_rating = user.answer_set.all().aggregate(answers_rating=Sum('rating'))
+        user_rating = 0
+        try:
+            user_rating += questions_rating['questions_rating']
+        except:
+            pass
+        try:
+            user_rating += answers_rating['answers_rating']
+        except:
+            pass
+        dct.update({user.username: user_rating})
+
+    lst_d = list(dct.items())
+    lst_d.sort(key=lambda i: i[1])
+    lst_d.reverse()
+    lst_names = []
+    for i in lst_d[:100]:
+        lst_names.append(i[0])
+    return render(request, 'top100_app_page.html', {'users': lst_names})
 
 
 def top_100_app(request):

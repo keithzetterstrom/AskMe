@@ -28,6 +28,6 @@ urlpatterns = [
         login_required(views.correct_answer), name='answer_correct'),
     url(r'^top100-nginx/$', views.top_100_nginx, name='top100_nginx'),
     url(r'^top100-app/$', views.top_100_app, name='top100_app'),
-    #url(r'^top100-app-page/$', views.top_100_app_page, name='top100_app_page'),
+    url(r'^top100-app-page/$', views.top_100_app_page, name='top100_app_page'),
     url(r'^test/$', views.test_centrifugo, name='test')
 ]
