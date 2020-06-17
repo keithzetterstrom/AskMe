@@ -1,18 +1,23 @@
 'use strict';
 
-function like() {
-    var like = $(this);
-    var type = like.data('type');
-    var pk = like.data('id');
-    var action = like.data('action');
-    var dislike = like.next();
-
+function like(type, pk) {
     $.ajax({
-        url : "/AskMe/js/" + type +"/" + pk + "/" + action + "/",
+        url : "/AskMe/js/" + type +"/" + pk + "/like/",
         type : 'POST',
         data : { 'obj' : pk },
         success : function (json) {
             document.getElementById("rating_"+pk).innerText = json.rating;
+            var image_like = document.getElementById("like_img_"+pk);
+            var image_dislike = document.getElementById("dislike_img_"+pk);
+            if (json.result)
+            {
+                image_like.src = '/static/img/like_active.png';
+                image_dislike.src = '/static/img/dislike.png';
+            }
+            else
+            {
+                image_like.src = '/static/img/like.png';
+            }
             //like.find("[data-count='like']").text(json.like_count);
             //dislike.find("[data-count='dislike']").text(json.dislike_count);
         }
@@ -20,15 +25,9 @@ function like() {
     return false;
 }
 
-function dislike() {
-    var dislike = $(this);
-    var type = dislike.data('type');
-    var pk = dislike.data('id');
-    var action = dislike.data('action');
-    var like = dislike.prev();
-
+function dislike(type, pk) {
     $.ajax({
-        url: "/AskMe/js/" + type + "/" + pk + "/" + action + "/",
+        url: "/AskMe/js/" + type + "/" + pk + "/dislike/",
         type: 'POST',
         data: {'obj': pk},
 
@@ -36,6 +35,17 @@ function dislike() {
             document.getElementById("rating_"+pk).innerText = json.rating;
             //like.find("[data-count='like']").text(json.like_count);
             //dislike.find("[data-count='dislike']").text(json.dislike_count);
+            var image_like = document.getElementById("like_img_"+pk);
+            var image_dislike = document.getElementById("dislike_img_"+pk);
+            if (json.result)
+            {
+                image_dislike.src = '/static/img/dislike_active.png';
+                image_like.src = '/static/img/like.png';
+            }
+            else
+            {
+                image_dislike.src = '/static/img/dislike.png';
+            }
         }
     });
 
@@ -82,7 +92,7 @@ $(function () {
 });
 
 // Подключение обработчиков
-$(function() {
-    $('[data-action="like"]').click(like);
-    $('[data-action="dislike"]').click(dislike);
-});
+// $(function() {
+//     $('[data-action="like"]').click(like);
+//     $('[data-action="dislike"]').click(dislike);
+// });

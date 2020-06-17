@@ -20,7 +20,7 @@ class Command(BaseCommand):
         lst_tags = []
         for i in lst_d:
             lst_tags.append(i[0])
-        cache.set('top100_tags', lst_tags, 300)
+        cache.set('top100_tags', lst_tags, 1800)
 
     def handle(self, *args, **options):
         self.rating_tags()

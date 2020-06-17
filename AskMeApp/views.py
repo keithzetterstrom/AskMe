@@ -2,7 +2,7 @@ import json
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Count, Sum
+from django.db.models import Sum
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from django.utils.http import urlencode
@@ -32,6 +32,22 @@ def create_paginator(data, elements_in_page, page):
         # Если страница больше максимальной, доставить последнюю страницу результатов
         posts = paginator.page(paginator.num_pages)
     return posts
+
+
+def get_vote_for_object(obj, user):
+    try:
+        like_dislike = Like.objects.get(content_type=ContentType.objects.get_for_model(obj),
+                                        object_id=obj.id,
+                                        user=user)
+        # если оценка лайк
+        if like_dislike.vote == 1:
+            return 1
+        # если оценка дизлайк
+        else:
+            return -1
+    # если оценоки нет
+    except Like.DoesNotExist:
+        return 0
 
 
 def index(request):
@@ -121,14 +137,18 @@ def ask(request):
 def questions(request):
     context = {}
 
-    #questions_qs = Question.objects.get_new_questions()
-    questions_qs = Question.objects.prefetch_related('author', 'answer_set').order_by('-make_time')
+    questions_qs = Question.objects.get_new_questions()
+    #questions_qs = Question.objects.prefetch_related('author', 'answer_set').order_by('-make_time')
 
     page = request.GET.get('page')
     posts = create_paginator(questions_qs, 20, page)
 
-    context.update({'page': page})
-    context.update({'posts': posts.object_list.annotate(answers_count=Count('answer'))})
+    if request.user.is_authenticated:
+        votes_dct = {}
+        for obj in posts:
+            votes_dct.update({obj: get_vote_for_object(obj, request.user)})
+        context.update({'votes': votes_dct})
+    context.update({'posts': posts})
     context.update({'status': 1})
     return render(request, 'questions.html', context)
 
@@ -144,6 +164,12 @@ def question(request, question_id):
 
     # если пользователь авторизован, отобразить форму для ответа
     if request.user.is_authenticated:
+        context.update({'like': get_vote_for_object(question_obj, request.user)})
+        votes_dct = {}
+        for obj in posts:
+            votes_dct.update({obj: get_vote_for_object(obj, request.user)})
+        context.update({'votes': votes_dct})
+
         token = jwt.encode({"sub": str(request.user.id)}, CENTRIFUGE_SECRET).decode()
         context.update({'token': token})
         context.update({'user': request.user})
@@ -161,11 +187,11 @@ def question(request, question_id):
                 cl.publish(str(question_obj.id), {'id': post.id,
                                                   'author': request.user.username,
                                                   'text': post.answer_text,
-                                                  'time': post.make_time.strftime(),
+                                                  'time': post.make_time.strftime("%B %-m, %Y, %-H:%M %p"),
                                                   'avatar': request.user.avatar.url})
                 # берем страницу пагинатора ответов для редиректа на созданный ответ
-                get_args_str = urlencode({'page': 1})
-                url = '/AskMe/question/' + str(question_obj.id) + '/?' + get_args_str
+                #get_args_str = urlencode({'page': 1})
+                url = '/AskMe/question/' + str(question_obj.id)# + '/?' + get_args_str
                 return HttpResponseRedirect(url)
         else:
             form = AnswerForm()
@@ -185,7 +211,12 @@ def tag(request, tag_name):
     page = request.GET.get('page')
     posts = create_paginator(questions_qs, 20, page)
 
-    context.update({'page': page})
+    if request.user.is_authenticated:
+        votes_dct = {}
+        for obj in posts:
+            votes_dct.update({obj: get_vote_for_object(obj, request.user)})
+        context.update({'votes': votes_dct})
+
     context.update({'posts': posts})
     context.update({'status': 1})
     return render(request, 'questions.html', context)
@@ -198,7 +229,12 @@ def hot(request):
     page = request.GET.get('page')
     posts = create_paginator(questions_qs, 20, page)
 
-    context.update({'page': page})
+    if request.user.is_authenticated:
+        votes_dct = {}
+        for obj in posts:
+            votes_dct.update({obj: get_vote_for_object(obj, request.user)})
+        context.update({'votes': votes_dct})
+
     context.update({'posts': posts})
     context.update({'status': 0})
     return render(request, 'questions.html', context)

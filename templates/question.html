@@ -13,12 +13,20 @@
             {% if user.is_authenticated %}
                 <div class="row mt-3">
                     <div class="likes">
-                        <button type="button" name="like_btn" class="mx-2" data-id="{{ question.id }}" data-type="question" data-action="like" title="Like">
-                            <img src="{% static 'img/like.png' %}" width="17px">
+                        <button type="button" name="like_btn" class="mx-2" onclick="like('question', {{ question.id }})" title="Like">
+                            {% if like == 1 %}
+                                <img id="like_img_{{ question.id }}" src="{% static 'img/like_active.png' %}" width="17px">
+                            {% else %}
+                                <img id="like_img_{{ question.id }}" src="{% static 'img/like.png' %}" width="17px">
+                            {% endif %}
                         </button>
 
-                        <button type="button" name="like_btn" class="" data-id="{{ question.id }}" data-type="question" data-action="dislike" title="Dislike">
-                            <img src="{% static 'img/dislike.png' %}" width="17px">
+                        <button type="button" name="like_btn" class="" onclick="dislike('question', {{ question.id }})" title="Dislike">
+                            {% if like == -1 %}
+                                <img id="dislike_img_{{ question.id }}" src="{% static 'img/dislike_active.png' %}" width="17px">
+                            {% else %}
+                                <img id="dislike_img_{{ question.id }}" src="{% static 'img/dislike.png' %}" width="17px">
+                            {% endif %}
                         </button>
                     </div>
                 </div>
@@ -56,9 +64,9 @@
 
     <div id="answers" class=" mx-5 border-bottom border-secondary">
         {% if answers %}
-            {% for answer in answers %}
+            {% for post, like in votes.items %}
                 <div class="my-3">
-                    {% include 'inc/answer.html' with answer=answer question=question %}
+                    {% include 'inc/answer.html' with answer=post like=like question=question %}
                 </div>
             {% endfor %}
             {% include 'inc/pagination.html' with page=answers %}
@@ -74,8 +82,7 @@
         </div>
     {% endif %}
 
-    <script src="https://cdn.jsdelivr.net/gh/centrifugal/centrifuge-js@2.6.2/dist/centrifuge.min.js"></script>
-    {% comment %}<script src="{% static '/js/centrifuge.min.js' %}"></script>{% endcomment %}
+    <script src="{% static '/js/centrifuge.min.js' %}"></script>
     <script type="text/javascript">
         cent = new Centrifuge('ws://127.0.0.1:8001/connection/websocket');
         cent.setToken("{{ token }}");
@@ -93,14 +100,14 @@
                 '            </p>\n' +
                     '                <div class="row mt-3">\n'+
                     '                    <div class="likes">\n'+
-                    '                        <button type="button" name="like_btn" class="mx-2" data-id="'+ ms['id'] +'" data-type="answer" data-action="like" title="Like">\n'
+                    '                        <button type="button" name="like_btn" class="mx-2" onclick="like(\'answer\', '+ ms['id'] +')" title="Like">\n'
                     +
-                    '                            <img src="{% static 'img/like.png' %}" width="17px">\n'+
+                    '                            <img id="like_img_'+ ms['id'] +'" src="{% static 'img/like.png' %}" width="17px">\n'+
                     '                        </button>\n'+
                     '\n'+
-                    '                        <button type="button" name="like_btn" class="" data-id="'+ ms['id'] +'" data-type="answer" data-action="dislike" title="Dislike">\n'
+                    '                        <button type="button" name="like_btn" class="" onclick="dislike(\'answer\', '+ ms['id'] +')" title="Dislike">\n'
                     +
-                    '                            <img src="{% static 'img/dislike.png' %}" width="17px">\n'+
+                    '                            <img id="dislike_img_'+ ms['id'] +'" src="{% static 'img/dislike.png' %}" width="17px">\n'+
                     '                        </button>\n'+
                     '                    </div>\n'+
                     '                </div>\n'+

@@ -7,9 +7,9 @@ from django.db.models import Count
 
 class QuestionManager(models.Manager):
     def get_new_questions(self):
-        # new_questions = self.all().prefetch_related('author').order_by('-make_time').\
-        #     annotate(answers_count=Count('answer'))
-        new_questions = self.annotate(answers_count=Count('answer'))
+        new_questions = self.all().prefetch_related('author').order_by('-make_time').\
+            annotate(answers_count=Count('answer'))
+        #new_questions = self.annotate(answers_count=Count('answer'))
         return new_questions
 
     def get_questions_by_tag(self, tag):

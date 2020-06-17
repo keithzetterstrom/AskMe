@@ -10,12 +10,20 @@
             {% if user.is_authenticated %}
                 <div class="row mt-3">
                     <div class="likes">
-                        <button type="button" name="like_btn" class="mx-2" data-id="{{ answer.id }}" data-type="answer" data-action="like" title="Like">
-                            <img src="{% static 'img/like.png' %}" width="17px">
+                        <button type="button" name="like_btn" class="mx-2" onclick="like('answer', {{ answer.id }})" title="Like">
+                            {% if like == 1 %}
+                                <img id="like_img_{{ answer.id }}" src="{% static 'img/like_active.png' %}" width="17px">
+                            {% else %}
+                                <img id="like_img_{{ answer.id }}" src="{% static 'img/like.png' %}" width="17px">
+                            {% endif %}
                         </button>
 
-                        <button type="button" name="like_btn" class="" data-id="{{ answer.id }}" data-type="answer" data-action="dislike" title="Dislike">
-                            <img src="{% static 'img/dislike.png' %}" width="17px">
+                        <button type="button" name="like_btn" class="" onclick="dislike('answer', {{ answer.id }})" title="Dislike">
+                            {% if like == -1 %}
+                                <img id="dislike_img_{{ answer.id }}" src="{% static 'img/dislike_active.png' %}" width="17px">
+                            {% else %}
+                                <img id="dislike_img_{{ answer.id }}" src="{% static 'img/dislike.png' %}" width="17px">
+                            {% endif %}
                         </button>
                     </div>
                 </div>
@@ -24,12 +32,10 @@
                     <div class="likes">
                         <button disabled type="button" name="like_btn" class="mx-2">
                             <img src="{% static 'img/like.png' %}" width="17px">
-                            {% comment %}<span data-count="like">{{ answer.likes_count }}</span>{% endcomment %}
                         </button>
 
                         <button disabled type="button" name="like_btn" class="" >
                             <img src="{% static 'img/dislike.png' %}" width="17px">
-                            {% comment %}<span data-count="dislike">{{ answer.dislikes_count }}</span>{% endcomment %}
                         </button>
                     </div>
                 </div>
